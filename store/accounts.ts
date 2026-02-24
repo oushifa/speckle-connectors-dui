@@ -108,6 +108,7 @@ export const useAccountStore = defineStore('accountStore', () => {
   const refreshAccounts = async () => {
     isLoading.value = true
     const accs = (await $accountBinding?.getAccounts()) || []
+    console.log(accs, 'refreshAccounts')
 
     const newAccs: DUIAccount[] = []
 
@@ -174,9 +175,20 @@ export const useAccountStore = defineStore('accountStore', () => {
         }
       })
 
-      const link = splitLink(
-        getLinks(new URL('/graphql', acc.serverInfo.url).href, 'Bearer ' + acc.token)
-      )
+      let graphqlUrl: string
+      try {
+        graphqlUrl = new URL('/graphql', acc.serverInfo.url).href
+        console.log('graphqlUrl', graphqlUrl)
+      } catch (error) {
+        logToSeq('Error', 'Invalid Account URL', {
+          accountId: acc.id,
+          serverUrl: acc.serverInfo.url,
+          error
+        })
+        continue
+      }
+
+      const link = splitLink(getLinks(graphqlUrl, 'Bearer ' + acc.token))
       const client = new ApolloClient({
         cache: new InMemoryCache(),
         link: from([errorLink, link]),

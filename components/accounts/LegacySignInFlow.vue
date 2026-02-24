@@ -98,7 +98,7 @@ const emit = defineEmits<{
 const showCustomServerInput = ref(false)
 const isAddingAccount = ref(false)
 const isDesktopServiceAvailable = ref(false) // this should be false default because there is a delay if /ping is not successful.
-const customServerUrl = ref<string | undefined>('https://app.speckle.systems')
+const customServerUrl = ref<string | undefined>('http://47.100.77.97:64482')
 const showHelp = ref(false)
 
 const accountCheckerIntervalFn = useIntervalFn(

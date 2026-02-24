@@ -18,8 +18,11 @@ const hostApp = useHostAppStore()
 
 onMounted(async () => {
   try {
-    const origin = getChallengeUrl()
+    // const origin = getChallengeUrl()
+    const origin = 'http://47.100.77.97:64482'
     const accessCode = route.query.access_code as string | undefined
+    console.log(accessCode, 'accessCode')
+    console.log(origin, 'origin')
     if (accessCode && origin) {
       const challenge = getChallenge()
       const body = {
@@ -29,12 +32,17 @@ onMounted(async () => {
         challenge
       }
 
+      console.log(body, 'body')
+
       // Exchange the access code for a real token (optional)
-      const response = await fetch(new URL('/auth/token', origin), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      })
+      const response = await fetch(
+        new URL('http://47.100.77.97:64482/auth/token', origin),
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }
+      )
       if (!response.ok) {
         const errorText = await response.text()
 

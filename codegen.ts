@@ -1,7 +1,7 @@
 import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
-  schema: 'https://app.speckle.systems/graphql',
+  schema: 'http://47.100.77.97:64482/graphql',
   documents: ['{lib,components,layouts,pages,middleware}/**/*.{vue,js,ts}'],
   ignoreNoDocuments: true, // for better experience with the watcher
   generates: {

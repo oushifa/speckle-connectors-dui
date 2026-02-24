@@ -35,33 +35,81 @@ export type Account = {
 export interface IAccountBindingEvents extends IBindingSharedEvents {}
 
 export class MockedAccountBinding implements IAccountBinding {
+  public availableMethodNames = ['getAccounts', 'addAccount', 'removeAccount']
+
+  private getStoredAccounts(): Account[] {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = localStorage.getItem('mock-accounts')
+        if (stored) return JSON.parse(stored) as Account[]
+      }
+    } catch (e) {
+      console.warn('Failed to load accounts from localStorage', e)
+    }
+    return []
+  }
+
+  private saveAccounts(accounts: Account[]) {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('mock-accounts', JSON.stringify(accounts))
+      }
+    } catch (e) {
+      console.warn('Failed to save accounts to localStorage', e)
+    }
+  }
+
   public async getAccounts() {
     const config = useRuntimeConfig()
-    return (await [
-      {
-        id: 'whatever',
-        isDefault: true,
-        token: config.public.speckleToken,
+    const accounts = this.getStoredAccounts()
+
+    const token = config.public.speckleToken as string | undefined
+    const url = config.public.speckleUrl as string | undefined
+
+    if (token && token !== 'undefined' && url && url !== 'undefined') {
+      const envAccount: Account = {
+        id: 'env-account',
+        isDefault: accounts.length === 0,
+        token,
+        refreshToken: '',
         serverInfo: {
-          name: 'test',
-          url: config.public.speckleUrl,
+          name: 'Env Server',
+          url,
           frontend2: true
         },
         userInfo: {
-          id: 'whatever',
-          avatar: 'whatever',
-          email: ''
+          id: 'env-user',
+          avatar: '',
+          email: 'env@speckle.systems',
+          name: 'Env User',
+          commits: { totalCount: 0 },
+          streams: { totalCount: 0 }
         }
       }
-    ]) as Account[]
+      if (!accounts.find((a) => a.id === 'env-account')) {
+        accounts.unshift(envAccount)
+      }
+    }
+
+    return await Promise.resolve(accounts)
   }
 
   public async addAccount(accountId: string, account: Account) {
-    return await console.log('no way dude', accountId, account)
+    await Promise.resolve()
+    const accounts = this.getStoredAccounts()
+    const idx = accounts.findIndex((a) => a.id === accountId)
+    if (idx !== -1) {
+      accounts[idx] = account
+    } else {
+      accounts.push(account)
+    }
+    this.saveAccounts(accounts)
   }
 
   public async removeAccount(accountId: string) {
-    return await console.log('no way dude', accountId)
+    await Promise.resolve()
+    const accounts = this.getStoredAccounts().filter((a) => a.id !== accountId)
+    this.saveAccounts(accounts)
   }
 
   public async showDevTools() {

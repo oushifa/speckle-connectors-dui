@@ -43,6 +43,7 @@ export type WorkspacesConfig = {
 
 // Useless, but will do for now :)
 export class MockedConfigBinding implements IConfigBinding {
+  public availableMethodNames = ['getGlobalConfig', 'getConfig']
   public async getIsDevMode() {
     return await true
   }

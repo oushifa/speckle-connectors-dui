@@ -8,7 +8,7 @@
             <FormButton
               full-width
               class="flex items-center"
-              @click="$openUrl('https://app.speckle.systems/workspaces/actions/create')"
+              @click="$openUrl('http://47.100.77.97:64482/workspaces/actions/create')"
             >
               <div class="min-w-0 truncate flex-grow">
                 <span>{{ 'Create a workspace' }}</span>

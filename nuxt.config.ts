@@ -2,6 +2,10 @@ import legacy from '@vitejs/plugin-legacy'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  devServer: {
+    host: process.env.HOST || '0.0.0.0',
+    port: process.env.PORT ? parseInt(process.env.PORT) : 8082
+  },
   typescript: {
     shim: false,
     strict: true

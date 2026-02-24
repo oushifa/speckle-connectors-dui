@@ -677,7 +677,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     connectorVersion.value = await app.$baseBinding.getConnectorVersion()
 
     const canGetGlobalConfig = ['getGlobalConfig', 'GetGlobalConfig'].some((name) =>
-      (app.$configBinding as unknown as BaseBridge).availableMethodNames.includes(name)
+      (app.$configBinding as unknown as BaseBridge).availableMethodNames?.includes(name)
     )
 
     if (canGetGlobalConfig) {

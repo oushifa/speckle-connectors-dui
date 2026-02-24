@@ -180,6 +180,7 @@ export class SketchupBridge extends BaseBridge {
    * @param eventPayload
    */
   private async sendBatchViaBrowser(eventPayload: SendBatchViaBrowserArgs) {
+    console.log(eventPayload, 'sendBatchViaBrowser')
     const {
       serverUrl,
       token,

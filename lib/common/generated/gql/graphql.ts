@@ -383,11 +383,6 @@ export type AdminQueriesWorkspaceListArgs = {
   query?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type AdminSupportMutations = {
-  __typename?: 'AdminSupportMutations';
-  externalSync: AdminExternalSyncMutations;
-};
-
 export type AdminUpdateEmailVerificationInput = {
   email: Scalars['String']['input'];
   /** Defaults to true. If set to false, the email will be marked as unverified. */
@@ -497,6 +492,10 @@ export type AppUpdateInput = {
 export type ApproveWorkspaceJoinRequestInput = {
   userId: Scalars['String']['input'];
   workspaceId: Scalars['String']['input'];
+};
+
+export type ApproveWorkspaceSupportAccessInput = {
+  sessionId: Scalars['ID']['input'];
 };
 
 export type ArchiveCommentInput = {
@@ -1253,6 +1252,14 @@ export type CreateModelInput = {
   projectId: Scalars['ID']['input'];
 };
 
+export type CreateProjectResourceMetaInput = {
+  data: Scalars['JSON']['input'];
+  metaType: Scalars['String']['input'];
+  projectId: Scalars['String']['input'];
+  resourceId: Scalars['String']['input'];
+  resourceType: ResourceMetaType;
+};
+
 export type CreateSavedViewGroupInput = {
   /** Will default to auto-generated group name otherwise */
   groupName?: InputMaybe<Scalars['String']['input']>;
@@ -1300,6 +1307,12 @@ export type CreateVersionInput = {
   projectId: Scalars['String']['input'];
   sourceApplication?: InputMaybe<Scalars['String']['input']>;
   totalChildrenCount?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type CreateWorkspaceResourceMetaInput = {
+  data: Scalars['JSON']['input'];
+  metaType: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
 };
 
 export enum Currency {
@@ -1402,6 +1415,7 @@ export type DashboardMutationsUpdateArgs = {
 
 export type DashboardPermissionChecks = {
   __typename?: 'DashboardPermissionChecks';
+  canAccessModelValidation: PermissionCheckResult;
   canCreateToken: PermissionCheckResult;
   canDelete: PermissionCheckResult;
   canDuplicate: PermissionCheckResult;
@@ -2583,7 +2597,6 @@ export type Mutation = {
   activeUserMutations: ActiveUserMutations;
   admin: AdminMutations;
   adminDeleteUser: Scalars['Boolean']['output'];
-  adminSupport: AdminSupportMutations;
   /** Creates an personal api token. */
   apiTokenCreate: Scalars['String']['output'];
   /** Revokes (deletes) an personal api token/app token. */
@@ -2644,10 +2657,12 @@ export type Mutation = {
   notificationMutations: NotificationMutations;
   /** @deprecated Part of the old API surface and will be removed in the future. */
   objectCreate: Array<Scalars['String']['output']>;
+  powerTools: PowerToolsMutations;
   projectMutations: ProjectMutations;
   /** (Re-)send the account verification e-mail */
   requestVerification: SentEmailInfo;
   requestVerificationByEmail: SentEmailInfo;
+  resourceMetaMutations: ResourceMetaMutations;
   serverInfoMutations: ServerInfoMutations;
   serverInfoUpdate?: Maybe<Scalars['Boolean']['output']>;
   /** Note: The required scope to invoke this is not given out to app or personal access tokens */
@@ -3070,18 +3085,13 @@ export type ObjectCreateInput = {
 };
 
 export type OnboardingCompletionInput = {
-  plans?: InputMaybe<Array<Scalars['String']['input']>>;
-  role?: InputMaybe<Scalars['String']['input']>;
-  source?: InputMaybe<Scalars['String']['input']>;
+  /** The primary use case for how Speckle will help the user in their role */
+  useCase?: InputMaybe<Scalars['String']['input']>;
 };
 
 export enum PaidWorkspacePlans {
   Business = 'business',
-  Legacy = 'legacy',
-  Pro = 'pro',
-  ProUnlimited = 'proUnlimited',
-  Team = 'team',
-  TeamUnlimited = 'teamUnlimited'
+  Legacy = 'legacy'
 }
 
 export type PasswordStrengthCheckFeedback = {
@@ -3171,6 +3181,11 @@ export type PermissionCheckResult = {
   errorMessage?: Maybe<Scalars['String']['output']>;
   message: Scalars['String']['output'];
   payload?: Maybe<Scalars['JSONObject']['output']>;
+};
+
+export type PowerToolsMutations = {
+  __typename?: 'PowerToolsMutations';
+  externalSync: AdminExternalSyncMutations;
 };
 
 export type Price = {
@@ -4109,6 +4124,7 @@ export enum ProjectPendingVersionsUpdatedMessageType {
 export type ProjectPermissionChecks = {
   __typename?: 'ProjectPermissionChecks';
   canAccessIssuesFeature: PermissionCheckResult;
+  canAccessViewerTableFeature: PermissionCheckResult;
   canBroadcastActivity: PermissionCheckResult;
   canCreateAutomation: PermissionCheckResult;
   /** @deprecated Comments were moved to issues. Use canCreateIssue instead. This check will be removed after 01 Jun 2026. */
@@ -4117,6 +4133,7 @@ export type ProjectPermissionChecks = {
   canCreateIngestion: PermissionCheckResult;
   canCreateIssue: PermissionCheckResult;
   canCreateModel: PermissionCheckResult;
+  canCreateResourceMeta: PermissionCheckResult;
   canCreateSavedView: PermissionCheckResult;
   canDelete: PermissionCheckResult;
   canInvite: PermissionCheckResult;
@@ -4147,6 +4164,19 @@ export type ProjectPermissionChecksCanMoveToWorkspaceArgs = {
 
 export type ProjectPermissionChecksCanUseInviteArgs = {
   type?: InputMaybe<InviteUseType>;
+};
+
+export type ProjectResourceMeta = {
+  __typename?: 'ProjectResourceMeta';
+  authorId?: Maybe<Scalars['ID']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  data: Scalars['JSON']['output'];
+  id: Scalars['ID']['output'];
+  metaType: Scalars['String']['output'];
+  projectId: Scalars['String']['output'];
+  resourceId: Scalars['String']['output'];
+  resourceType: ResourceMetaType;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type ProjectRole = {
@@ -4342,6 +4372,8 @@ export type Query = {
    * isn't specified, the server will look for any valid invite.
    */
   projectInvite?: Maybe<PendingStreamCollaborator>;
+  projectResourceMeta: ProjectResourceMeta;
+  projectResourceMetaSearch: Array<ProjectResourceMeta>;
   serverInfo: ServerInfo;
   /** Receive metadata about an invite by the invite token */
   serverInviteByToken?: Maybe<ServerInvite>;
@@ -4407,6 +4439,8 @@ export type Query = {
    * Either token or workspaceId must be specified, or both
    */
   workspaceInvite?: Maybe<PendingWorkspaceCollaborator>;
+  workspaceResourceMeta: WorkspaceResourceMeta;
+  workspaceResourceMetaSearch: Array<WorkspaceResourceMeta>;
   /** Find workspaces a given user email can use SSO to sign with */
   workspaceSsoByEmail: Array<LimitedWorkspace>;
 };
@@ -4469,6 +4503,20 @@ export type QueryProjectArgs = {
 export type QueryProjectInviteArgs = {
   projectId: Scalars['String']['input'];
   token?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryProjectResourceMetaArgs = {
+  id: Scalars['ID']['input'];
+  projectId: Scalars['String']['input'];
+};
+
+
+export type QueryProjectResourceMetaSearchArgs = {
+  metaType?: InputMaybe<Scalars['String']['input']>;
+  projectId: Scalars['String']['input'];
+  resourceId: Scalars['String']['input'];
+  resourceType: ResourceMetaType;
 };
 
 
@@ -4551,6 +4599,18 @@ export type QueryWorkspaceInviteArgs = {
 };
 
 
+export type QueryWorkspaceResourceMetaArgs = {
+  id: Scalars['ID']['input'];
+  workspaceId: Scalars['String']['input'];
+};
+
+
+export type QueryWorkspaceResourceMetaSearchArgs = {
+  metaType?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['String']['input'];
+};
+
+
 export type QueryWorkspaceSsoByEmailArgs = {
   email: Scalars['String']['input'];
 };
@@ -4560,11 +4620,41 @@ export type RemoveWorkspaceDomainInput = {
   workspaceId: Scalars['ID']['input'];
 };
 
+export type RequestWorkspaceSupportAccessInput = {
+  /** Optional expiry timestamp. Null means no expiration. */
+  validUntil?: InputMaybe<Scalars['DateTime']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
 export type ResourceIdentifier = {
   __typename?: 'ResourceIdentifier';
   resourceId: Scalars['String']['output'];
   resourceType: ResourceType;
 };
+
+export type ResourceMetaMutations = {
+  __typename?: 'ResourceMetaMutations';
+  createProjectResourceMeta: ProjectResourceMeta;
+  createWorkspaceResourceMeta: WorkspaceResourceMeta;
+};
+
+
+export type ResourceMetaMutationsCreateProjectResourceMetaArgs = {
+  input: CreateProjectResourceMetaInput;
+};
+
+
+export type ResourceMetaMutationsCreateWorkspaceResourceMetaArgs = {
+  input: CreateWorkspaceResourceMetaInput;
+};
+
+export enum ResourceMetaType {
+  Issue = 'issue',
+  Model = 'model',
+  Object = 'object',
+  Project = 'project',
+  Version = 'version'
+}
 
 export enum ResourceType {
   Comment = 'comment',
@@ -4572,6 +4662,10 @@ export enum ResourceType {
   Object = 'object',
   Stream = 'stream'
 }
+
+export type RevokeWorkspaceSupportAccessInput = {
+  sessionId: Scalars['ID']['input'];
+};
 
 export type Role = {
   __typename?: 'Role';
@@ -4584,7 +4678,8 @@ export type RootPermissionChecks = {
   __typename?: 'RootPermissionChecks';
   canCreatePersonalProject: PermissionCheckResult;
   canCreateWorkspace: PermissionCheckResult;
-  canUseAdminSupportTools: PermissionCheckResult;
+  canManageServerWorkspaces: PermissionCheckResult;
+  canUsePowerTools: PermissionCheckResult;
 };
 
 export type SavedView = {
@@ -5432,6 +5527,11 @@ export type Subscription = {
    */
   workspaceProjectsUpdated: WorkspaceProjectsUpdatedMessage;
   /**
+   * Track support session changes for a specific workspace.
+   * Fires when sessions are requested, approved, revoked, or expire.
+   */
+  workspaceSupportSessionUpdated: WorkspaceSupportSessionUpdatedMessage;
+  /**
    * Track updates to a specific workspace.
    * Either slug or id must be set.
    */
@@ -5586,6 +5686,11 @@ export type SubscriptionWorkspacePlanUsageUpdatedArgs = {
 export type SubscriptionWorkspaceProjectsUpdatedArgs = {
   workspaceId?: InputMaybe<Scalars['String']['input']>;
   workspaceSlug?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type SubscriptionWorkspaceSupportSessionUpdatedArgs = {
+  workspaceId: Scalars['String']['input'];
 };
 
 
@@ -5762,6 +5867,11 @@ export type UpgradeToPaidlPlanInput = {
  */
 export type User = {
   __typename?: 'User';
+  /**
+   * All active support sessions for the current user across all workspaces.
+   * Used by the frontend to show support mode banners globally.
+   */
+  activeSupportSessions: Array<WorkspaceSupportSession>;
   /** The last-visited workspace for the given user */
   activeWorkspace?: Maybe<LimitedWorkspace>;
   /**
@@ -6444,6 +6554,12 @@ export type WebhookUpdateInput = {
 
 export type Workspace = {
   __typename?: 'Workspace';
+  /**
+   * The current user's active or pending support session for this workspace.
+   * Null if the current user has no active/pending session.
+   * Only relevant for server admins — used to show the support mode CTA state.
+   */
+  activeSupportSession?: Maybe<WorkspaceSupportSession>;
   /** Get all join requests for all the workspaces the user is an admin of */
   adminWorkspacesJoinRequests?: Maybe<WorkspaceJoinRequestCollection>;
   automateFunctions: AutomateFunctionCollection;
@@ -6512,6 +6628,12 @@ export type Workspace = {
   /** Information about the workspace's SSO configuration and the current user's SSO session, if present */
   sso?: Maybe<WorkspaceSso>;
   subscription?: Maybe<WorkspaceSubscription>;
+  /**
+   * Paginated list of support sessions for this workspace.
+   * Includes pending, active, revoked, and expired sessions.
+   * Only accessible to workspace admins.
+   */
+  supportSessions: WorkspaceSupportSessionCollection;
   team: WorkspaceCollaboratorCollection;
   teamByRole: WorkspaceTeamByRole;
   updatedAt: Scalars['DateTime']['output'];
@@ -6557,6 +6679,13 @@ export type WorkspaceIssueLabelsArgs = {
 export type WorkspaceProjectsArgs = {
   cursor?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<WorkspaceProjectsFilter>;
+  limit?: Scalars['Int']['input'];
+};
+
+
+export type WorkspaceSupportSessionsArgs = {
+  cursor?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<WorkspaceSupportSessionFilter>;
   limit?: Scalars['Int']['input'];
 };
 
@@ -6689,6 +6818,7 @@ export enum WorkspaceFeatureName {
   Presentations = 'presentations',
   ProjectDashboards = 'projectDashboards',
   SavedViews = 'savedViews',
+  ViewerTable = 'viewerTable',
   WorkspaceDataRegionSpecificity = 'workspaceDataRegionSpecificity'
 }
 
@@ -6919,6 +7049,8 @@ export type WorkspaceMutations = {
   requestToJoin: Scalars['Boolean']['output'];
   /** Set the default region where project data will be stored. Only available to admins. */
   setDefaultRegion: Workspace;
+  /** Support session management mutations */
+  support: WorkspaceSupportMutations;
   update: Workspace;
   /** @deprecated workspaces no longer have creation state, is always created true. Field will be removed after 01 Jun 2026 */
   updateCreationState: Scalars['Boolean']['output'];
@@ -7002,10 +7134,6 @@ export type WorkspacePaidPlanPrices = {
   __typename?: 'WorkspacePaidPlanPrices';
   business: WorkspacePlanPrice;
   legacy: WorkspacePlanPrice;
-  pro: WorkspacePlanPrice;
-  proUnlimited: WorkspacePlanPrice;
-  team: WorkspacePlanPrice;
-  teamUnlimited: WorkspacePlanPrice;
 };
 
 export enum WorkspacePaymentMethod {
@@ -7018,7 +7146,6 @@ export type WorkspacePermissionChecks = {
   __typename?: 'WorkspacePermissionChecks';
   canAcceptJoinRequest: PermissionCheckResult;
   canAccessDashboards: PermissionCheckResult;
-  canAccessModelValidation: PermissionCheckResult;
   canAccessSso: PermissionCheckResult;
   canChangeSeatType: PermissionCheckResult;
   canCreateDashboards: PermissionCheckResult;
@@ -7035,6 +7162,8 @@ export type WorkspacePermissionChecks = {
   canManageInvites: PermissionCheckResult;
   canManageJoinRequests: PermissionCheckResult;
   canManageSso: PermissionCheckResult;
+  /** Whether the current user can approve/manage support sessions (workspace admins only) */
+  canManageSupportSessions: PermissionCheckResult;
   canMoveProjectToWorkspace: PermissionCheckResult;
   canReadAutomateSettings: PermissionCheckResult;
   canReadBillingSettings: PermissionCheckResult;
@@ -7047,12 +7176,14 @@ export type WorkspacePermissionChecks = {
   canReadWorkspaceIssueLabels: PermissionCheckResult;
   canRejectJoinRequest: PermissionCheckResult;
   canRemoveUser: PermissionCheckResult;
+  /** Whether the current user can request support access to this workspace (server admins only) */
+  canRequestSupportAccess: PermissionCheckResult;
   canResendInvite: PermissionCheckResult;
   canSendJoinRequest: PermissionCheckResult;
   canUpgradePlan: PermissionCheckResult;
-  canUseAdminSupportTools: PermissionCheckResult;
   canUseExperimentalDashboardFeatures: PermissionCheckResult;
   canUseInvite: PermissionCheckResult;
+  canUsePowerTools: PermissionCheckResult;
 };
 
 
@@ -7130,12 +7261,6 @@ export enum WorkspacePlans {
   Enterprise = 'enterprise',
   Free = 'free',
   Legacy = 'legacy',
-  Pro = 'pro',
-  ProUnlimited = 'proUnlimited',
-  ProUnlimitedInvoiced = 'proUnlimitedInvoiced',
-  Team = 'team',
-  TeamUnlimited = 'teamUnlimited',
-  TeamUnlimitedInvoiced = 'teamUnlimitedInvoiced',
   Unlimited = 'unlimited'
 }
 
@@ -7228,6 +7353,17 @@ export type WorkspaceRequestToJoinInput = {
   workspaceId: Scalars['ID']['input'];
 };
 
+export type WorkspaceResourceMeta = {
+  __typename?: 'WorkspaceResourceMeta';
+  authorId?: Maybe<Scalars['ID']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  data: Scalars['JSON']['output'];
+  id: Scalars['ID']['output'];
+  metaType: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  workspaceId: Scalars['String']['output'];
+};
+
 export enum WorkspaceRole {
   Admin = 'ADMIN',
   Guest = 'GUEST',
@@ -7311,6 +7447,112 @@ export type WorkspaceSubscriptionSeats = {
   editors: WorkspaceSubscriptionSeatCount;
   viewers: WorkspaceSubscriptionSeatCount;
 };
+
+export type WorkspaceSupportMutations = {
+  __typename?: 'WorkspaceSupportMutations';
+  /**
+   * Approve a pending support access request. Only workspace admins can approve.
+   * Activates the session and notifies the requesting server admin.
+   */
+  approveAccess: WorkspaceSupportSession;
+  /**
+   * Request access to a workspace for support purposes. Only server admins can request access.
+   * Creates a pending session and notifies workspace admins for approval.
+   */
+  requestAccess: WorkspaceSupportSession;
+  /**
+   * Revoke/stop support access. Works on both pending (denial) and active (revocation) sessions.
+   * Can be called by the requesting server admin or a workspace admin.
+   */
+  revokeAccess: WorkspaceSupportSession;
+};
+
+
+export type WorkspaceSupportMutationsApproveAccessArgs = {
+  input: ApproveWorkspaceSupportAccessInput;
+};
+
+
+export type WorkspaceSupportMutationsRequestAccessArgs = {
+  input: RequestWorkspaceSupportAccessInput;
+};
+
+
+export type WorkspaceSupportMutationsRevokeAccessArgs = {
+  input: RevokeWorkspaceSupportAccessInput;
+};
+
+/**
+ * A support session grants a server admin temporary access to a workspace for support purposes.
+ * Sessions are requested by server admins and must be approved by workspace admins.
+ * The session is tied to the admin user (not a specific token), so any auth token the admin
+ * uses will have support access for the workspace while the session is active.
+ */
+export type WorkspaceSupportSession = {
+  __typename?: 'WorkspaceSupportSession';
+  /** The server admin who requested/holds this support session */
+  adminUser?: Maybe<LimitedUser>;
+  /** When the session was approved by a workspace admin. Null if still pending. */
+  approvedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** The workspace admin who approved the session. Null if still pending. */
+  approvedBy?: Maybe<LimitedUser>;
+  /** When the session request was created */
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  /** When the session was revoked/denied. Null if not revoked. */
+  revokedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Current status of the session */
+  status: WorkspaceSupportSessionStatus;
+  /**
+   * When the session expires. Null means no expiration.
+   * A session with a past validUntil is considered expired regardless of stored status.
+   */
+  validUntil?: Maybe<Scalars['DateTime']['output']>;
+  /** The workspace this session grants access to */
+  workspace: LimitedWorkspace;
+};
+
+export type WorkspaceSupportSessionCollection = {
+  __typename?: 'WorkspaceSupportSessionCollection';
+  cursor?: Maybe<Scalars['String']['output']>;
+  items: Array<WorkspaceSupportSession>;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type WorkspaceSupportSessionFilter = {
+  /** Filter by session status(es). Returns all statuses if not specified. */
+  status?: InputMaybe<Array<WorkspaceSupportSessionStatus>>;
+};
+
+/**
+ * Support session status lifecycle:
+ * pending → active → revoked/expired
+ */
+export enum WorkspaceSupportSessionStatus {
+  /** Session has been approved and support access is active */
+  Active = 'active',
+  /** Session has passed its validUntil timestamp */
+  Expired = 'expired',
+  /** Session has been requested by a server admin, awaiting workspace admin approval */
+  Pending = 'pending',
+  /** Session was manually stopped/revoked by either party (covers both denial and revocation) */
+  Revoked = 'revoked'
+}
+
+export type WorkspaceSupportSessionUpdatedMessage = {
+  __typename?: 'WorkspaceSupportSessionUpdatedMessage';
+  /** The affected support session */
+  session: WorkspaceSupportSession;
+  /** The type of update that occurred */
+  type: WorkspaceSupportSessionUpdatedMessageType;
+};
+
+export enum WorkspaceSupportSessionUpdatedMessageType {
+  Approved = 'APPROVED',
+  Expired = 'EXPIRED',
+  Requested = 'REQUESTED',
+  Revoked = 'REVOKED'
+}
 
 export type WorkspaceSyncUsage = {
   __typename?: 'WorkspaceSyncUsage';

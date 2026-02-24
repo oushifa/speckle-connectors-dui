@@ -55,7 +55,7 @@ const { pingDesktopService } = useDesktopService()
 
 const { $accountBinding } = useNuxtApp()
 const canAddAccount = ['AddAccount', 'addAccount'].some((name) =>
-  ($accountBinding as unknown as BaseBridge).availableMethodNames.includes(name)
+  ($accountBinding as unknown as BaseBridge).availableMethodNames?.includes(name)
 )
 
 const showLegacy = ref(false)

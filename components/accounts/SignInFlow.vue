@@ -13,7 +13,7 @@
         v-model="customServerUrl"
         name="name"
         :show-label="false"
-        placeholder="https://app.speckle.systems"
+        placeholder="http://47.100.77.97:64482"
         color="foundation"
         autocomplete="off"
         show-clear
@@ -30,12 +30,12 @@ import { ref } from 'vue'
 import { useAuthManager } from '~/lib/authn/useAuthManager'
 import type { BaseBridge } from '~/lib/bridge/base'
 
-const customServerUrl = ref<string | undefined>('https://app.speckle.systems')
+const customServerUrl = ref<string | undefined>('http://47.100.77.97:64482')
 const showCustomServerInput = ref(false)
 
 const { $accountBinding } = useNuxtApp()
 const canAddAccount = ['AddAccount', 'addAccount'].some((name) =>
-  ($accountBinding as unknown as BaseBridge).availableMethodNames.includes(name)
+  ($accountBinding as unknown as BaseBridge).availableMethodNames?.includes(name)
 )
 
 const { generateChallenge } = useAuthManager()
@@ -43,7 +43,7 @@ const { generateChallenge } = useAuthManager()
 const logIn = () => {
   const serverUrl = customServerUrl.value
     ? new URL(customServerUrl.value).origin
-    : 'https://app.speckle.systems'
+    : 'http://47.100.77.97:64482'
   const challenge = generateChallenge(serverUrl)
   const authUrl = `${serverUrl}/authn/verify/sdui/${challenge}`
   window.location.href = authUrl

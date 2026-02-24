@@ -38,7 +38,7 @@
               >
                 <div v-if="app.$sendBinding" class="grow">
                   <FormButton
-                    v-tippy="'Publish objects from this file to a new model'"
+                    v-tippy="'Publish objects from this file to a new model test2'"
                     :icon-left="ArrowUpTrayIcon"
                     color="outline"
                     full-width
@@ -270,6 +270,6 @@ const reload = () => {
 }
 
 const openSpeckleConnectors = () => {
-  window.open('https://app.speckle.systems/connectors', '_blank')
+  window.open('http://47.100.77.97:64482/connectors', '_blank')
 }
 </script>

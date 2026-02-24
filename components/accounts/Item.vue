@@ -63,9 +63,8 @@ import { TrashIcon } from '@heroicons/vue/24/outline'
 import type { BaseBridge } from '~/lib/bridge/base'
 
 const { $accountBinding } = useNuxtApp()
-
 const canRemoveAccount = ['RemoveAccount', 'removeAccount'].some((name) =>
-  ($accountBinding as unknown as BaseBridge).availableMethodNames.includes(name)
+  ($accountBinding as unknown as BaseBridge).availableMethodNames?.includes(name)
 )
 
 const props = defineProps<{

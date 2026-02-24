@@ -335,6 +335,7 @@ export class ArchicadBridge {
       shouldTimeout: boolean
     ) => Promise<unknown>
   ) {
+    console.log(eventPayload, 'sendBatchViaBrowser')
     const {
       serverUrl,
       token,

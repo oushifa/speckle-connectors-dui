@@ -14,7 +14,7 @@
         </div>
         <div class="relative group flex items-center">
           <FormButton
-            v-tippy="'Publish objects from this file to a new Speckle model'"
+            v-tippy="'Publish objects from this file to a new Speckle model test'"
             color="outline"
             size="sm"
             class="relative group px-0"
