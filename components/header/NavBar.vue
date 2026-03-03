@@ -5,16 +5,10 @@
   >
     <div class="flex items-center transition-all justify-between w-full">
       <div class="flex items-center space-x-2">
-        <div class="max-[200px]:hidden block ml-2">
-          <img
-            class="block h-6 w-6"
-            src="~~/assets/images/speckle_logo_big.png"
-            alt="Speckle"
-          />
-        </div>
+        <div class="max-[200px]:hidden block ml-2"></div>
         <div class="relative group flex items-center">
           <FormButton
-            v-tippy="'Publish objects from this file to a new Speckle model test'"
+            v-tippy="'将此文件中的对象发布到线上新模型'"
             color="outline"
             size="sm"
             class="relative group px-0"
@@ -26,7 +20,7 @@
         <div class="relative group flex items-center">
           <FormButton
             v-if="app.$receiveBinding"
-            v-tippy="'Load a model from Speckle into this file'"
+            v-tippy="'从线上加载模型到此文件'"
             color="outline"
             size="sm"
             class="relative group px-0"
@@ -56,41 +50,6 @@
         >
           {{ hostAppStore.connectorVersion }}
         </div>
-        <div
-          v-if="!hostAppStore.isDistributedBySpeckle && hostAppStore.hostAppName"
-          v-tippy="
-            `${hostAppStore.hostAppName
-              .charAt(0)
-              .toUpperCase()}${hostAppStore.hostAppName.slice(
-              1
-            )} connector is not distributed by Speckle.`
-          "
-          class="text-xs text-foreground-disabled max-[150px]:hidden mr-1"
-        >
-          <CommonBadge color="secondary">Partner</CommonBadge>
-        </div>
-        <HeaderButton
-          v-if="hostAppStore.isDistributedBySpeckle"
-          v-tippy="'Documentation and help'"
-          @click="
-            app.$openUrl(
-              `https://docs.speckle.systems/connectors/${hostAppStore.hostAppName}?utm=dui`
-            )
-          "
-        >
-          <QuestionMarkCircleIcon
-            class="w-4 text-foreground-disabled group-hover:text-foreground-2"
-          />
-        </HeaderButton>
-        <HeaderButton
-          v-if="hostAppStore.isDistributedBySpeckle"
-          v-tippy="'Send us feedback'"
-          @click="openFeedbackDialog()"
-        >
-          <ChatBubbleLeftIcon
-            class="w-4 text-foreground-disabled group-hover:text-foreground-2"
-          />
-        </HeaderButton>
         <HeaderUserMenu />
       </div>
     </div>
@@ -103,12 +62,7 @@
   </nav>
 </template>
 <script setup lang="ts">
-import {
-  ArrowUpTrayIcon,
-  ArrowDownTrayIcon,
-  QuestionMarkCircleIcon,
-  ChatBubbleLeftIcon
-} from '@heroicons/vue/24/solid'
+import { ArrowUpTrayIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/solid'
 
 import { useHostAppStore } from '~/store/hostApp'
 const app = useNuxtApp()
@@ -122,18 +76,4 @@ app.$baseBinding?.on('documentChanged', () => {
   showSendDialog.value = false
   showReceiveDialog.value = false
 })
-
-const { $intercom } = useNuxtApp()
-
-const openFeedbackDialog = () => {
-  if (
-    (hostAppStore.hostAppName?.toLowerCase() === 'revit' &&
-      hostAppStore.hostAppVersion?.includes('2022')) ||
-    !hostAppStore.isDistributedBySpeckle
-  ) {
-    showFeedbackDialog.value = true
-  } else {
-    $intercom.show()
-  }
-}
 </script>

@@ -6,7 +6,7 @@
       full-width
       @click="showCustomServerInput = !showCustomServerInput"
     >
-      {{ showCustomServerInput ? 'Use default server' : 'Set custom server url' }}
+      {{ showCustomServerInput ? '使用默认服务器' : '设置自定义服务器 URL' }}
     </FormButton>
     <div v-if="showCustomServerInput">
       <FormTextInput
@@ -21,7 +21,7 @@
       />
     </div>
 
-    <FormButton v-if="canAddAccount" full-width @click="logIn()">Sign in</FormButton>
+    <FormButton v-if="canAddAccount" full-width @click="logIn()">登录</FormButton>
   </div>
 </template>
 

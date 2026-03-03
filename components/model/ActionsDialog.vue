@@ -9,7 +9,7 @@
     />
     <CommonDialog
       v-model:open="openModelCardActionsDialog"
-      :title="`${modelName} actions`"
+      :title="`${modelName} 操作`"
       fullscreen="none"
     >
       <SendSettingsDialog
@@ -19,7 +19,7 @@
       >
         <template #activator="{ toggle }">
           <button class="action action-normal" @click="toggle()">
-            <div class="truncate max-[275px]:text-xs">Settings</div>
+            <div class="truncate max-[275px]:text-xs">设置</div>
             <div><Cog6ToothIcon class="w-5 h-5" /></div>
           </button>
         </template>
@@ -27,7 +27,7 @@
       <ReportBase v-if="modelCard.report" :report="modelCard.report">
         <template #activator="{ toggle }">
           <button class="action action-normal" @click="toggle()">
-            <div class="truncate max-[275px]:text-xs">View Report</div>
+            <div class="truncate max-[275px]:text-xs">查看报告</div>
             <div><InformationCircleIcon class="w-5 h-5" /></div>
           </button>
         </template>
@@ -39,7 +39,7 @@
       >
         <template #activator="{ toggle }">
           <button class="action action-normal" @click="toggle()">
-            <div class="truncate max-[275px]:text-xs">Issues</div>
+            <div class="truncate max-[275px]:text-xs">问题</div>
             <div><Cog6ToothIcon class="w-5 h-5" /></div>
           </button>
         </template>
@@ -95,7 +95,7 @@ app.$baseBinding?.on('documentChanged', () => {
 
 const items = [
   {
-    name: 'View 3D model in browser',
+    name: '在浏览器中查看 3D 模型',
     icon: ArrowTopRightOnSquareIcon,
     action: () => {
       void trackEvent('DUI3 Action', {
@@ -107,7 +107,7 @@ const items = [
     }
   },
   {
-    name: 'View model versions',
+    name: '查看模型版本',
     icon: ClockIcon,
     action: () => {
       void trackEvent('DUI3 Action', {
@@ -119,7 +119,7 @@ const items = [
     }
   },
   {
-    name: 'Remove from file',
+    name: '从文件中移除',
     danger: true,
     icon: ArchiveBoxXMarkIcon,
     action: () => {

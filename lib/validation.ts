@@ -27,10 +27,9 @@ const isValidModelName: GenericValidateFunction<string> = (name) => {
     name.indexOf('//') !== -1 ||
     name.indexOf(',') !== -1
   )
-    return 'Value should not start with "#", "$", start or end with "/", have multiple slashes next to each other or contain commas'
+    return '值不能以 "#" 或 "$" 开头，不能以 "/" 开头或结尾，不能有连续的斜杠，也不能包含逗号'
 
-  if (['globals', 'main'].includes(name))
-    return `'main' and 'globals' are reserved names`
+  if (['globals', 'main'].includes(name)) return `'main' 和 'globals' 是保留名称`
 
   return true
 }

@@ -2,7 +2,7 @@
   <div>
     <button
       v-if="!justDialog"
-      v-tippy="`Click to change the account.`"
+      v-tippy="`点击切换账户。`"
       @click="showAccountsDialog = true"
     >
       <UserAvatar v-if="!showAccountsDialog" :user="user" hover-effect size="sm" />
@@ -12,7 +12,7 @@
     </button>
     <CommonDialog
       v-model:open="showAccountsDialog"
-      :title="`${justDialog ? 'Your accounts' : 'Select account'}`"
+      :title="`${justDialog ? '您的账户' : '选择账户'}`"
       fullscreen="none"
     >
       <div class="pb-2">
@@ -32,11 +32,11 @@
             size="sm"
             @click="showAddNewAccount = !showAddNewAccount"
           >
-            Add a new account
+            添加新账户
           </FormButton>
           <CommonDialog
             v-model:open="showAddNewAccount"
-            title="Add a new account"
+            title="添加新账户"
             fullscreen="none"
           >
             <div class="flex flex-col space-y-2">
@@ -51,7 +51,7 @@
                 class="text-xs"
                 @click="showLegacy = true"
               >
-                Legacy Sign in
+                旧版登录
               </FormButton>
             </div>
           </CommonDialog>

@@ -17,7 +17,7 @@
         hide-text
         @click="toggleTheme()"
       >
-        Toggle theme
+        切换主题
       </FormButton>
       <FormButton
         v-if="hostApp.hostAppName?.toLowerCase() === 'revit'"
@@ -28,7 +28,7 @@
         hide-text
         @click="app.$showDevTools()"
       >
-        Open dev tools
+        打开开发者工具
       </FormButton>
     </div>
   </div>

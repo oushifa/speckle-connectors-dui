@@ -330,8 +330,8 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
       } else {
         setNotification({
           type: ToastNotificationType.Danger,
-          title: 'Publish Error',
-          description: 'Could not complete publish: Ingestion ID missing.'
+          title: '发布错误',
+          description: '无法完成发布：缺少 Ingestion ID。'
         })
       }
     } else {
@@ -392,12 +392,12 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
         sourceApplicationVersion: hostAppVersion.value?.toString() || 'unknown'
       }
       if (canCreateIngestion.authorized) {
-        await startIngestion(model, 'Starting to publish', sourceData)
-        model.progress = { status: 'Converting the objects...' }
+        await startIngestion(model, '开始发布', sourceData)
+        model.progress = { status: '正在转换对象...' }
       } else {
         setNotification({
           type: ToastNotificationType.Warning,
-          title: 'Cannot publish',
+          title: '无法发布',
           description: canCreateIngestion.message
         })
         return
@@ -412,8 +412,8 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
       if (!canCreate.authorized) {
         setNotification({
           type: ToastNotificationType.Warning,
-          title: 'Cannot publish',
-          description: canCreate.message || 'Workspace limits have been reached'
+          title: '无法发布',
+          description: canCreate.message || '已达到工作区限制'
         })
         return
       }
@@ -421,7 +421,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
 
     model.latestCreatedVersionId = undefined
     model.error = undefined
-    model.progress = { status: 'Starting to send...' }
+    model.progress = { status: '开始发送...' }
     model.expired = false
     model.report = undefined
 
@@ -481,7 +481,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     if (shouldHandleIngestion.value) {
       const ingestionId = activeIngestions.value[modelCardId]
       if (ingestionId) {
-        await cancelIngestion(model, ingestionId, 'Cancelled by user')
+        await cancelIngestion(model, ingestionId, '用户取消')
       }
     }
   }
@@ -538,7 +538,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     model.error = undefined
     model.displayReceiveComplete = false
     model.hasDismissedUpdateWarning = true
-    model.progress = { status: 'Starting to receive...' }
+    model.progress = { status: '开始接收...' }
 
     // You should stop asking why if you saw anything related autocad..
     // It solves the press "escape" issue.
@@ -604,7 +604,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
         await updateIngestion(
           model,
           ingestionId,
-          args.progress?.status || 'Progressing',
+          args.progress?.status || '进行中',
           args.progress?.progress || 0
         )
       }

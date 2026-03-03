@@ -14,20 +14,20 @@
       <FormTextArea
         v-model="feedback"
         name="feedback"
-        label="Feedback"
+        label="反馈"
         color="foundation"
       />
       <p v-if="!hideSuppport" class="text-body-xs !leading-4">
-        Need help? For support, head over to our
+        需要帮助？请前往我们的
         <FormButton
           target="_blank"
           link
           text
           @click="$openUrl(`https://speckle.community/`)"
         >
-          community forum
+          社区论坛
         </FormButton>
-        where we can chat and solve problems together.
+        寻求支持，我们可以一起讨论并解决问题。
       </p>
     </div>
   </CommonDialog>
@@ -62,19 +62,19 @@ const feedback = ref('')
 
 const dialogButtons = computed((): LayoutDialogButton[] => [
   {
-    text: 'Send',
+    text: '发送',
     props: { color: 'primary' },
     submit: true,
     id: 'sendFeedback'
   }
 ])
 
-const dialogTitle = computed(() => props.title || 'Give us feedback')
+const dialogTitle = computed(() => props.title || '给我们反馈')
 
 const dialogIntro = computed(
   () =>
     props.intro ||
-    'How can we improve Speckle? If you have a feature request, please also share how you would use it and why its important to you'
+    '我们如何改进 Speckle？如果您有功能请求，请分享您将如何使用它以及它对您的重要性'
 )
 
 const onSubmit = handleSubmit(async () => {
@@ -90,7 +90,7 @@ const onSubmit = handleSubmit(async () => {
 
   hostApp.setNotification({
     type: ToastNotificationType.Success,
-    title: 'Thank you for your feedback!'
+    title: '感谢您的反馈！'
   })
 
   const userId = accountStore.defaultAccount.accountInfo.userInfo.id ?? ''

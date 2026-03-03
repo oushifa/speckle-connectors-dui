@@ -136,9 +136,9 @@ const selectModel = (model: ModelListModelItemFragment) => {
 }
 
 const title = computed(() => {
-  if (step.value === 1) return 'Select project'
-  if (step.value === 2) return 'Select model'
-  if (step.value === 3) return 'Select version'
+  if (step.value === 1) return '选择项目'
+  if (step.value === 2) return '选择模型'
+  if (step.value === 3) return '选择版本'
   return ''
 })
 

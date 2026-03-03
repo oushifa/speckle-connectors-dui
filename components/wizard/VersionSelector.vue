@@ -5,12 +5,12 @@
         v-if="isLimited && workspaceSlug"
         class="flex items-center justify-between bg-foundation rounded-md border border-outline-3 p-1 space-x-2 text-xs"
       >
-        <div class="ml-1">Upgrade to load older versions.</div>
+        <div class="ml-1">升级以加载更早的版本。</div>
         <FormButton
           size="sm"
           @click="$openUrl(`${serverUrl}/settings/workspaces/${workspaceSlug}/billing`)"
         >
-          Upgrade
+          升级
         </FormButton>
       </div>
       <div v-if="hasReceiveSettings">
@@ -45,7 +45,7 @@
         :disabled="hasReachedEnd"
         @click="loadMore"
       >
-        {{ hasReachedEnd ? 'No older versions' : 'Show older versions' }}
+        {{ hasReachedEnd ? '没有更早的版本' : '显示更早的版本' }}
       </FormButton>
     </div>
   </div>

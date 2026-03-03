@@ -15,11 +15,11 @@
               <h1
                 class="text-heading-lg w-full bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 inline-block py-1 text-transparent bg-clip-text"
               >
-                Hello!
+                你好！
               </h1>
               <button
                 v-if="accountStore.activeAccount"
-                v-tippy="'Open web app'"
+                v-tippy="'打开 Web 应用'"
                 class="transition mr-1 opacity-70 hover:opacity-100"
                 @click.stop="
                   $openUrl(accountStore.activeAccount.accountInfo.serverInfo.url)
@@ -31,31 +31,31 @@
             <!-- Returning null from host app is blocked by CI for now, hence host app send here empty documentInfo, we check it's id whether null or not. -->
             <div v-if="!!store.documentInfo?.id">
               <div class="text-foreground-2 text-body-sm">
-                There are no Speckle models being published or loaded in this file yet.
+                此文件中尚未发布或加载模型。
               </div>
               <div
                 class="flex space-x-2 max-[275px]:flex-col max-[275px]:space-y-2 max-[275px]:space-x-0 mt-4"
               >
                 <div v-if="app.$sendBinding" class="grow">
                   <FormButton
-                    v-tippy="'Publish objects from this file to a new model test2'"
+                    v-tippy="'将此文件中的对象发布到新模型'"
                     :icon-left="ArrowUpTrayIcon"
                     color="outline"
                     full-width
                     @click="handleSendClick"
                   >
-                    Publish
+                    发布
                   </FormButton>
                 </div>
                 <div v-if="app.$receiveBinding" class="grow">
                   <FormButton
-                    v-tippy="'Load an existing model in this file'"
+                    v-tippy="'加载现有模型到此文件'"
                     :icon-left="ArrowDownTrayIcon"
                     color="outline"
                     full-width
                     @click="handleReceiveClick"
                   >
-                    Load
+                    加载
                   </FormButton>
                 </div>
               </div>
@@ -65,7 +65,7 @@
                 {{ store.documentInfo?.message }}
               </div>
               <div v-else class="text-foreground-2">
-                Welcome to Speckle! Please open a file to use this plugin.
+                欢迎使用！请打开一个文件以使用此插件。
               </div>
             </div>
             <!-- TEMPORARY MESSAGE TO USER! will be deleted -->
@@ -76,24 +76,15 @@
               <h1
                 class="text-heading-sm w-full bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 inline-block py-1 text-transparent bg-clip-text"
               >
-                Speckle for
+                适用于
                 <span class="capitalize">{{ store.hostAppName }}</span>
+                的 系统
               </h1>
               <div class="text-foreground-2 text-body-xs">
-                Get started in no time with our key workflows and tutorials for
+                通过我们的关键工作流程和教程，快速上手
                 <span class="capitalize">{{ store.hostAppName }}:</span>
-                <FormButton
-                  size="sm"
-                  color="outline"
-                  class="my-2"
-                  full-width
-                  @click="
-                    app.$openUrl(
-                      `https://docs.speckle.systems/connectors/${store.hostAppName}?utm=dui`
-                    )
-                  "
-                >
-                  Getting started
+                <FormButton size="sm" color="outline" class="my-2" full-width>
+                  开始使用
                 </FormButton>
               </div>
 
@@ -123,10 +114,10 @@
               <h1
                 class="text-heading-sm w-full bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 inline-block py-1 text-transparent bg-clip-text"
               >
-                Assign Revit Categories
+                分配 Revit 类别
               </h1>
               <div class="text-foreground-2 text-body-xs">
-                Set Rhino geometry categories for accurate DirectShape loading in Revit.
+                设置 Rhino 几何类别，以便在 Revit 中准确加载 DirectShape。
                 <FormButton
                   size="sm"
                   color="outline"
@@ -134,7 +125,7 @@
                   full-width
                   @click="$router.push('/revit-mapper')"
                 >
-                  Assign categories
+                  分配类别
                 </FormButton>
               </div>
             </div>
@@ -176,10 +167,10 @@
           width="120"
         />
         <h1 class="text-2xl md:text-3xl font-semibold text-foreground text-center">
-          Connector is not detected.
+          未检测到连接器。
         </h1>
         <FormButton color="outline" @click="openSpeckleConnectors">
-          Get them here
+          在这里获取
         </FormButton>
       </section>
     </div>
@@ -189,13 +180,13 @@
           <h1
             class="h4 font-bold bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 inline-block py-1 text-transparent bg-clip-text"
           >
-            Reload needed!
+            需要重新加载！
           </h1>
           <div class="text-foreground-2 mt-2 mb-4">
-            Host application lost its communication with user interface for some reason.
+            宿主应用程序与用户界面的通信因某种原因丢失。
           </div>
           <FormButton :icon-left="ArrowPathIcon" full-width @click="reload()">
-            Reload
+            重新加载
           </FormButton>
         </LayoutPanel>
       </div>

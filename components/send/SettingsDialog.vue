@@ -1,11 +1,7 @@
 <template>
   <div class="p-0">
     <slot name="activator" :toggle="toggleDialog"></slot>
-    <CommonDialog
-      v-model:open="showSettingsDialog"
-      :title="`Settings`"
-      fullscreen="none"
-    >
+    <CommonDialog v-model:open="showSettingsDialog" :title="`设置`" fullscreen="none">
       <ModelSettings
         :expandable="false"
         :default-settings="(store.sendSettings as unknown as CardSetting[])"
@@ -14,9 +10,9 @@
       ></ModelSettings>
       <div class="mt-4 flex justify-end items-center space-x-2">
         <FormButton size="sm" color="outline" @click="showSettingsDialog = false">
-          Cancel
+          取消
         </FormButton>
-        <FormButton size="sm" @click="saveSettings()">Save</FormButton>
+        <FormButton size="sm" @click="saveSettings()">保存</FormButton>
       </div>
     </CommonDialog>
   </div>

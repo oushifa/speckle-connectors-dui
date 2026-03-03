@@ -7,9 +7,7 @@
       !hasDismissedAlert &&
       !store.isUpdateNotificationDisabled
     "
-    v-tippy="
-      'Version: ' + store.latestAvailableVersion?.Number + ', released ' + createdAgo
-    "
+    v-tippy="'版本: ' + store.latestAvailableVersion?.Number + ', 发布于 ' + createdAgo"
     color="neutral"
     size="xs"
     hide-icon
@@ -17,10 +15,10 @@
   >
     <template #description>
       <div class="flex items-center">
-        <div class="text-body-3xs truncate line-clamp-1 min-w-0">Update available</div>
+        <div class="text-body-3xs truncate line-clamp-1 min-w-0">有可用更新</div>
         <div class="inline-flex justify-end -mr-3 grow">
           <FormButton size="sm" color="outline" @click="store.downloadLatestVersion()">
-            Download
+            下载
           </FormButton>
           <FormButton
             size="sm"

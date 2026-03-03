@@ -11,7 +11,7 @@
               @click="$openUrl('http://47.100.77.97:64482/workspaces/actions/create')"
             >
               <div class="min-w-0 truncate flex-grow">
-                <span>{{ 'Create a workspace' }}</span>
+                <span>{{ '创建工作区' }}</span>
               </div>
               <ArrowTopRightOnSquareIcon class="w-4" />
             </FormButton>
@@ -24,7 +24,7 @@
           >
             <template #activator="{ toggle }">
               <button
-                v-tippy="'Click to change the workspace'"
+                v-tippy="'点击切换工作区'"
                 class="flex items-center w-full p-1 space-x-2 bg-foundation hover:bg-primary-muted rounded text-foreground border"
                 @click="toggle()"
               >
@@ -38,7 +38,7 @@
                 </div>
                 <button
                   v-if="selectedWorkspace.slug"
-                  v-tippy="'Open workspace in browser'"
+                  v-tippy="'在浏览器中打开工作区'"
                   class="transition mr-1 opacity-70 hover:opacity-100"
                   @click.stop="
                     $openUrl(
@@ -64,7 +64,7 @@
         <div class="flex items-center space-x-1 justify-between">
           <FormTextInput
             v-model="searchText"
-            placeholder="Search your projects"
+            placeholder="搜索您的项目"
             name="search"
             autocomplete="off"
             :show-clear="!!searchText"
@@ -75,7 +75,7 @@
             <div
               v-tippy="
                 canCreateProject
-                  ? 'Create new project'
+                  ? '创建新项目'
                   : canCreateProjectPermissionCheck?.message
               "
             >
@@ -90,18 +90,18 @@
             </div>
             <CommonDialog
               v-model:open="showProjectCreateDialog"
-              :title="`Create new project`"
+              :title="`创建新项目`"
               fullscreen="none"
             >
               <form @submit="createProject(newProjectName as string)">
-                <div class="text-body-2xs mb-2 ml-1">Project name</div>
+                <div class="text-body-2xs mb-2 ml-1">项目名称</div>
                 <FormTextInput
                   v-model="newProjectName"
                   class="text-xs"
-                  placeholder="A Beautiful Home, A Small Bridge..."
+                  placeholder="例如：美丽的家、小桥..."
                   autocomplete="off"
                   name="name"
-                  label="Project name"
+                  label="项目名称"
                   color="foundation"
                   :show-clear="!!newProjectName"
                   :rules="[
@@ -112,14 +112,14 @@
                 />
                 <div class="mt-4 flex justify-end items-center space-x-2 w-full">
                   <FormButton size="sm" text @click="showProjectCreateDialog = false">
-                    Cancel
+                    取消
                   </FormButton>
                   <FormButton
                     size="sm"
                     submit
                     :disabled="isCreatingProject || !newProjectName"
                   >
-                    Create
+                    创建
                   </FormButton>
                 </div>
               </form>
@@ -149,7 +149,7 @@
                 size="sm"
                 @click="upgradePlanButtonAction()"
               >
-                Upgrade now
+                立即升级
               </FormButton>
             </template>
           </CommonAlert>
@@ -167,9 +167,7 @@
           :is-sender="isSender"
           @click="handleProjectCardClick(project)"
         />
-        <p v-if="projects?.length === 0 && !!searchText" class="text-sm">
-          No projects found
-        </p>
+        <p v-if="projects?.length === 0 && !!searchText" class="text-sm">未找到项目</p>
         <FormButton
           v-if="
             projects?.length === 0 &&
@@ -182,7 +180,7 @@
           class="block truncate overflow-hidden"
           @click="createProject(searchText)"
         >
-          Create "{{
+          创建 "{{
             searchText.length > 10 ? searchText.substring(0, 10) + '...' : searchText
           }}"
         </FormButton>
@@ -193,7 +191,7 @@
           color="outline"
           @click="loadMore"
         >
-          {{ hasReachedEnd ? 'No more projects found' : 'Load older projects' }}
+          {{ hasReachedEnd ? '没有更多项目了' : '加载更早的项目' }}
         </FormButton>
       </div>
     </div>
@@ -532,7 +530,7 @@ const createProject = (name: string) => {
   ) {
     hostAppStore.setNotification({
       type: 1,
-      title: 'Failed to create project',
+      title: '创建项目失败',
       description: canCreateProjectPermissionCheck.value.message as string
     })
     return
@@ -565,8 +563,8 @@ const createNewWorkspaceProject = async (name: string) => {
   onError((err) => {
     hostAppStore.setNotification({
       type: 1,
-      title: 'Failed to create project',
-      description: err.cause?.message ?? err.message ?? 'Unknown error'
+      title: '创建项目失败',
+      description: err.cause?.message ?? err.message ?? '未知错误'
     })
   })
 
@@ -596,8 +594,8 @@ const createNewPersonalProject = async (name: string) => {
   onError((err) => {
     hostAppStore.setNotification({
       type: 1,
-      title: 'Failed to create project',
-      description: err.cause?.message ?? err.message ?? 'Unknown error'
+      title: '创建项目失败',
+      description: err.cause?.message ?? err.message ?? '未知错误'
     })
   })
 

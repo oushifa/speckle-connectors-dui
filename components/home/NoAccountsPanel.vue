@@ -3,7 +3,7 @@
     <h1
       class="h4 w-full bg-red-400 text-center font-bold bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 inline-block py-1 text-transparent bg-clip-text"
     >
-      Welcome to Speckle
+      欢迎使用
     </h1>
     <div v-if="isDesktopServiceAvailable || canAddAccount">
       <AccountsSignInFlow v-if="!showLegacy" />
@@ -16,20 +16,18 @@
         class="text-xs"
         @click="showLegacy = true"
       >
-        Legacy Sign in
+        旧版登录
       </FormButton>
     </div>
     <div v-else>
       <div class="text-foreground-2 mt-2 mb-4">
-        To sign in and start using Speckle, you'll need the Desktop Service running.
-        This lightweight background service handles secure authentication.
+        要登录并开始使用系统，您需要运行 Desktop Service。
+        此轻量级后台服务处理安全身份验证。
       </div>
       <div class="space-y-3">
-        <FormButton full-width @click="$openUrl('https://releases.speckle.systems')">
-          Download Desktop Service
-        </FormButton>
+        <FormButton full-width>下载 Desktop Service</FormButton>
         <div class="text-center">
-          <div class="text-foreground-2 text-xs mb-2">Already installed?</div>
+          <div class="text-foreground-2 text-xs mb-2">已安装？</div>
           <FormButton
             size="sm"
             full-width
@@ -37,7 +35,7 @@
             link
             @click="accountStore.refreshAccounts()"
           >
-            Refresh to check again
+            刷新以再次检查
           </FormButton>
         </div>
       </div>

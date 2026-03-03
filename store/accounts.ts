@@ -147,9 +147,8 @@ export const useAccountStore = defineStore('accountStore', () => {
           ) {
             hostAppStore.setNotification({
               type: ToastNotificationType.Warning,
-              title: 'SSO Required',
-              description:
-                'Your workspace requires SSO authentication. Please sign in and try again.'
+              title: '需要 SSO',
+              description: '您的工作区需要 SSO 身份验证。请登录并重试。'
             })
           }
 
@@ -169,8 +168,8 @@ export const useAccountStore = defineStore('accountStore', () => {
         if (res.networkError && !navigator.onLine) {
           hostAppStore.setNotification({
             type: ToastNotificationType.Danger,
-            title: 'No Internet Connection',
-            description: 'Please check your network connection and try again.'
+            title: '无网络连接',
+            description: '请检查您的网络连接并重试。'
           })
         }
       })

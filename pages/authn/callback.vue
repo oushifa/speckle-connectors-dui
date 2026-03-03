@@ -12,7 +12,7 @@ import { useHostAppStore } from '~/store/hostApp'
 
 const route = useRoute()
 const router = useRouter()
-const { getChallenge, getChallengeUrl } = useAuthManager()
+const { getChallenge } = useAuthManager()
 const { $accountBinding } = useNuxtApp()
 const hostApp = useHostAppStore()
 
@@ -47,9 +47,9 @@ onMounted(async () => {
         const errorText = await response.text()
 
         hostApp.setNotification({
-          title: 'Log In',
+          title: '登录',
           type: ToastNotificationType.Danger,
-          description: `Token exchange failed with status ${response.status}: ${errorText}`
+          description: `令牌交换失败，状态码 ${response.status}: ${errorText}`
         })
         // Stop processing and redirect immediately on failure
         return router.replace('/')
@@ -94,12 +94,12 @@ onMounted(async () => {
 
       await $accountBinding.addAccount(accountId, account)
     } else {
-      throw new Error('No access code is found.')
+      throw new Error('未找到访问代码。')
     }
   } catch (error) {
     hostApp.setNotification({
       type: ToastNotificationType.Danger,
-      title: 'Failed to add your Speckle account.',
+      title: '添加账户失败。',
       description: error as string
     })
   } finally {

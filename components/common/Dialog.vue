@@ -90,7 +90,7 @@
                 <XMarkIcon class="h-6 w-6 text-foreground-2" />
               </FormButton>
               <div ref="slotContainer" :class="slotContainerClasses" @scroll="onScroll">
-                <slot>Put your content here!</slot>
+                <slot>在这里放置内容！</slot>
               </div>
               <div
                 v-if="hasButtons"

@@ -52,7 +52,7 @@
           :loading="isLoadingPermissions"
           @click="addModel"
         >
-          Publish
+          发布
         </FormButton>
       </div>
     </div>
@@ -192,9 +192,9 @@ const selectProject = (accountId: string, project: ProjectListProjectItemFragmen
 }
 
 const title = computed(() => {
-  if (step.value === 1) return 'Select project'
-  if (step.value === 2) return 'Select model'
-  if (step.value === 3) return 'Select objects'
+  if (step.value === 1) return '选择项目'
+  if (step.value === 2) return '选择模型'
+  if (step.value === 3) return '选择对象'
   return ''
 })
 

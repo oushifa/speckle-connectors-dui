@@ -76,7 +76,7 @@
           >
             <template #activator="{ toggle }">
               <FormButton
-                v-tippy="'Issues'"
+                v-tippy="'问题'"
                 color="subtle"
                 :icon-left="MessageCircleMore"
                 hide-text
@@ -87,7 +87,7 @@
           </IssuesDialog>
           <FormButton
             v-if="store.hostAppName !== 'navisworks' && store.hostAppName !== 'etabs'"
-            v-tippy="'Highlight'"
+            v-tippy="'高亮'"
             color="subtle"
             :icon-left="CursorArrowRaysIcon"
             hide-text
@@ -117,18 +117,18 @@
       </div>
     </div>
     <div v-else-if="loading" class="px-1 py-1">
-      Fetching model data...
+      正在获取模型数据...
       <CommonLoadingBar loading />
     </div>
     <div
       v-else
       class="flex flex-row items-center px-2 pt-2 text-body-2xs text-foreground-2 truncate text-red-500"
     >
-      <span class="ml-1.5">Error on loading model data.</span>
+      <span class="ml-1.5">加载模型数据出错。</span>
 
       <div class="flex items-center justify-end grow">
         <FormButton
-          v-tippy="'Remove model card'"
+          v-tippy="'移除模型卡片'"
           color="subtle"
           :icon-left="TrashIcon"
           hide-text
@@ -178,12 +178,12 @@
             <div class="flex items-center space-x-1">
               <UserAvatarGroup size="xs" :users="currentlyViewingUsers" />
               <span class="line-clamp-1">
-                {{ currentlyViewingUsers.length === 1 ? 'is' : 'are' }} now viewing
+                {{ currentlyViewingUsers.length === 1 ? '' : '' }} 人正在查看
               </span>
             </div>
             <div>
               <FormButton size="sm" color="outline" full-width @click="viewModel()">
-                Join
+                加入
               </FormButton>
             </div>
           </div>
@@ -197,8 +197,7 @@
             >
               <div
                 v-tippy="
-                  `${latestCommentNotification.comment?.author?.name} just left a
-                  comment.`
+                  `${latestCommentNotification.comment?.author?.name} 刚刚发表了评论。`
                 "
                 class="flex items-center space-x-1"
               >
@@ -207,13 +206,13 @@
                   :users="[latestCommentNotification.comment?.author as AvatarUserWithId]"
                 />
                 <span class="line-clamp-1">
-                  {{ latestCommentNotification.comment?.author?.name }} just left a
-                  comment on the issue.
+                  {{ latestCommentNotification.comment?.author?.name }}
+                  刚刚在问题上发表了评论。
                 </span>
               </div>
               <div>
                 <FormButton size="sm" color="outline" full-width @click="viewComment()">
-                  Reply
+                  回复
                 </FormButton>
               </div>
             </div>
@@ -286,10 +285,10 @@ const isSender = computed(() => {
 const buttonTooltip = computed(() => {
   if (props.ctaDisabled) return props.ctaDisabledMessage
   return props.modelCard.progress
-    ? 'Cancel'
+    ? '取消'
     : isSender.value
-    ? 'Publish model'
-    : 'Load selected version'
+    ? '发布模型'
+    : '加载选中版本'
 })
 
 const projectAccount = computed(() =>
@@ -297,9 +296,7 @@ const projectAccount = computed(() =>
 )
 
 const disabledMessage = computed(() =>
-  isSender.value
-    ? 'Publish is not permitted by your role on this project.'
-    : 'Load is not permitted by your role on this project.'
+  isSender.value ? '您的项目角色不允许发布。' : '您的项目角色不允许加载。'
 )
 
 const clientId = projectAccount.value.accountInfo.id
@@ -386,7 +383,7 @@ const highlightModel = () => {
   if (!isSender.value && !(props.modelCard as IReceiverModelCard).bakedObjectIds) {
     store.setModelError({
       modelCardId: props.modelCard.modelCardId,
-      error: 'No objects found to highlight.'
+      error: '未找到可高亮的对象。'
     })
     return
   }

@@ -8,7 +8,7 @@
           full-width
           @click="showCustomServerInput = !showCustomServerInput"
         >
-          {{ showCustomServerInput ? 'Use default server' : 'Set custom server url' }}
+          {{ showCustomServerInput ? '使用默认服务器' : '设置自定义服务器 URL' }}
         </FormButton>
         <div v-if="showCustomServerInput">
           <FormTextInput
@@ -30,35 +30,31 @@
             @click="emit('backToSignIn')"
           />
 
-          <FormButton full-width @click="startAccountAddFlow()">
-            Sign in (Legacy)
-          </FormButton>
+          <FormButton full-width @click="startAccountAddFlow()">旧版登录</FormButton>
         </div>
       </div>
 
       <div v-show="isAddingAccount" class="text-foreground-2 mt-2 mb-4 space-y-2">
-        <div class="text-sm text-center">
-          Please check your browser: waiting for authorization to complete.
-        </div>
+        <div class="text-sm text-center">请查看您的浏览器：正在等待授权完成。</div>
         <div class="py-2"><CommonLoadingBar :loading="isAddingAccount" /></div>
         <div v-if="showHelp" class="bg-blue-500/10 p-2 rounded-md space-y-2">
-          <div class="text-sm text-center">Having trouble?</div>
-          <FormButton size="sm" full-width @click="restartFlow()">Retry</FormButton>
+          <div class="text-sm text-center">遇到问题？</div>
+          <FormButton size="sm" full-width @click="restartFlow()">重试</FormButton>
           <FormButton
             text
             size="sm"
             full-width
             @click="$openUrl('https://speckle.community')"
           >
-            Get in touch with us
+            联系我们
           </FormButton>
         </div>
       </div>
     </div>
     <div v-else class="space-y-3">
       <div class="text-foreground-2 text-sm">
-        The Speckle Desktop Service is required to add accounts as legacy way. This
-        background service handles authentication securely.
+        需要 Speckle Desktop Service
+        才能以旧版方式添加账户。该后台服务负责安全身份验证。
       </div>
       <div class="flex space-x-2">
         <FormButton
@@ -69,7 +65,7 @@
           @click="emit('backToSignIn')"
         />
         <FormButton full-width @click="$openUrl('https://releases.speckle.systems')">
-          Download Desktop Service
+          下载 Desktop Service
         </FormButton>
       </div>
     </div>
@@ -139,10 +135,9 @@ const startAccountAddFlow = () => {
       accountCheckerIntervalFn.pause()
       // Note to Dim: not sure about toast
       hostApp.setNotification({
-        title: 'Sign In',
+        title: '登录',
         type: ToastNotificationType.Info,
-        description:
-          'Sign in timed out. This may have happened because you tried adding an existing account.'
+        description: '登录超时。可能是因为您尝试添加已存在的账户。'
       })
       // TODO: we could log it to sentry/seq later to see how likely it happens?
     }

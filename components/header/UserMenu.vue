@@ -3,7 +3,7 @@
     <AccountsMenu v-model:open="showAccountsDialog" just-dialog />
     <Menu as="div" class="flex items-center z-100">
       <MenuButton v-slot="{ open }">
-        <span class="sr-only">Open user menu</span>
+        <span class="sr-only">打开用户菜单</span>
         <FormButton
           color="subtle"
           size="sm"
@@ -33,7 +33,7 @@
                 'my-1 text-body-2xs flex px-2 py-1 text-foreground cursor-pointer transition mx-1 rounded'
               ]"
             >
-              {{ isDarkTheme ? 'Light theme' : 'Dark theme' }}
+              {{ isDarkTheme ? '浅色主题' : '深色主题' }}
             </div>
           </MenuItem>
           <div class="border-t border-outline-3 mt-1">
@@ -46,7 +46,7 @@
                 ]"
                 @click="$router.push('/revit-mapper')"
               >
-                Assign Revit Categories
+                分配 Revit 类别
               </button>
             </MenuItem>
             <MenuItem
@@ -64,22 +64,7 @@
                   'my-1 text-body-2xs flex px-2 py-1 text-foreground cursor-pointer transition mx-1 rounded'
                 ]"
               >
-                Manage accounts
-              </div>
-            </MenuItem>
-          </div>
-          <div class="border-t border-outline-3 mt-1">
-            <MenuItem
-              v-slot="{ active }"
-              @click="$openUrl(`https://www.speckle.systems?utm=dui`)"
-            >
-              <div
-                :class="[
-                  active ? 'bg-highlight-1' : '',
-                  'my-1 text-body-2xs flex px-2 py-1 text-foreground cursor-pointer transition mx-1 rounded'
-                ]"
-              >
-                About Speckle
+                管理账户
               </div>
             </MenuItem>
           </div>
@@ -94,7 +79,7 @@
                   'my-1 text-body-3xs flex px-2 py-1 text-foreground-2 cursor-pointer transition mx-1 rounded'
                 ]"
               >
-                Open Dev Tools
+                打开开发者工具
               </div>
             </MenuItem>
 
@@ -106,7 +91,7 @@
                   'text-body-3xs flex px-2 py-1 text-foreground-2 cursor-pointer transition mx-1 rounded'
                 ]"
               >
-                Test Page
+                测试页面
               </NuxtLink>
             </MenuItem>
           </div>

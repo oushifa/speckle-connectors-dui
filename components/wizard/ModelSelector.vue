@@ -5,7 +5,7 @@
         <FormTextInput
           v-model="searchText"
           :placeholder="
-            totalCount === 0 ? 'New model name' : 'Search in ' + project.name
+            totalCount === 0 ? '新模型名称' : '在 ' + project.name + ' 中搜索'
           "
           name="search"
           autocomplete="off"
@@ -16,7 +16,7 @@
         <div
           v-tippy="
             canCreateModelResult?.project.permissions.canCreateModel.authorized
-              ? 'Create new model'
+              ? '创建新模型'
               : canCreateModelResult?.project.permissions.canCreateModel.message
           "
         >
@@ -38,7 +38,7 @@
           !canCreateModelResult.project.permissions.canCreateModel.authorized
         "
       >
-        <CommonAlert title="Cannot create new models" color="info" hide-icon>
+        <CommonAlert title="无法创建新模型" color="info" hide-icon>
           <template #description>
             {{ canCreateModelResult.project.permissions.canCreateModel.message }}
 
@@ -54,7 +54,7 @@
                 )
               "
             >
-              Explore Plans
+              查看方案
             </FormButton>
           </template>
         </CommonAlert>
@@ -72,24 +72,24 @@
 
         <CommonDialog
           v-model:open="showSelectionHasProblemsDialog"
-          title="Warning"
+          title="警告"
           fullscreen="none"
         >
           <div class="mx-1">
-            <p class="text-body-xs mb-2">You are about to overwrite this model.</p>
+            <p class="text-body-xs mb-2">您即将覆盖此模型。</p>
             <p
               v-if="hasNonZeroVersionsProblem"
               class="mb-2 text-body-3xs text-foreground-2"
             >
-              The model you selected contains versions coming from
-              <b>other files/apps</b>
-              .
+              您选择的模型包含来自
+              <b>其他文件/应用</b>
+              的版本。
             </p>
             <p v-if="existingModelProblem" class="mb-2 text-body-3xs text-foreground-2">
               <b>{{ ` ${existingModelName}` }}</b>
-              is already being used to
-              <b>{{ isSender ? 'publish,' : 'load,' }}</b>
-              you could consider using the existing one.
+              已经被用于
+              <b>{{ isSender ? '发布，' : '加载，' }}</b>
+              您可以考虑使用现有的那个。
             </p>
           </div>
           <template #buttons>
@@ -99,10 +99,10 @@
               text
               @click="showSelectionHasProblemsDialog = false"
             >
-              Cancel
+              取消
             </FormButton>
             <FormButton full-width size="sm" @click="confirmModelSelection()">
-              Proceed
+              继续
             </FormButton>
           </template>
         </CommonDialog>
@@ -117,7 +117,7 @@
           :disabled="isCreatingModel"
           @click="createNewModel(searchText)"
         >
-          Create "{{ searchText }}"
+          创建 "{{ searchText }}"
         </FormButton>
         <FormButton
           v-else
@@ -126,13 +126,13 @@
           :disabled="hasReachedEnd"
           @click="loadMore"
         >
-          {{ hasReachedEnd ? 'No more models found' : 'Load older models' }}
+          {{ hasReachedEnd ? '没有更多模型了' : '加载更早的模型' }}
         </FormButton>
       </div>
     </div>
     <CommonDialog
       v-model:open="showNewModelDialog"
-      title="Create new model"
+      title="创建新模型"
       fullscreen="none"
     >
       <form @submit="createNewModel(newModelName as string)">
@@ -149,10 +149,10 @@
         />
         <div class="mt-4 flex justify-end items-center space-x-2 w-full">
           <FormButton size="sm" text @click="showNewModelDialog = false">
-            Cancel
+            取消
           </FormButton>
           <FormButton size="sm" submit :disabled="isCreatingModel || !newModelName">
-            Create
+            创建
           </FormButton>
         </div>
       </form>
@@ -252,7 +252,7 @@ const createNewModel = async (name: string) => {
   if (!canCreateModelResult.value?.project.permissions.canCreateModel.authorized) {
     hostAppStore.setNotification({
       type: 1,
-      title: 'Failed to create model',
+      title: '创建模型失败',
       description:
         canCreateModelResult.value?.project.permissions.canCreateModel.message
     })
@@ -272,14 +272,14 @@ const createNewModel = async (name: string) => {
     // emit('next', res?.data?.modelMutations.create)
     handleModelCreated(res?.data?.modelMutations.create)
   } else {
-    let errorMessage = 'Undefined error'
+    let errorMessage = '未定义错误'
     if (res?.errors && res?.errors.length !== 0) {
       errorMessage = res?.errors[0].message
     }
 
     hostAppStore.setNotification({
       type: 1,
-      title: 'Failed to create model',
+      title: '创建模型失败',
       description: errorMessage
     })
   }

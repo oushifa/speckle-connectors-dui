@@ -4,7 +4,7 @@
       <FormSelectBase
         v-model="selectedFilterName"
         name="sendFilter"
-        label="Selected filter"
+        label="已选过滤器"
         class="w-full"
         fixed-height
         size="sm"
@@ -27,8 +27,7 @@
         "
       >
         <div class="p-4 text-primary bg-blue-500/10 rounded-md text-xs">
-          All supported objects will be sent. Depending on the model, this might take a
-          while.
+          所有支持的对象都将被发送。根据模型大小，这可能需要一些时间。
         </div>
       </div>
       <div
@@ -84,9 +83,9 @@
       </div>
     </div>
     <div v-if="!!filter" class="text-xs caption rounded p-2 bg-orange-500/10">
-      This action will replace the existing
+      此操作将替换现有的
       <b>{{ selectedFilterName }}</b>
-      filter.
+      过滤器。
     </div>
   </div>
 </template>
