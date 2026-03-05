@@ -8,7 +8,7 @@
     <div v-if="isDesktopServiceAvailable || canAddAccount">
       <AccountsSignInFlow v-if="!showLegacy" />
       <AccountsLegacySignInFlow v-else @back-to-sign-in="showLegacy = false" />
-      <FormButton
+      <!-- <FormButton
         v-if="!showLegacy"
         text
         full-width
@@ -17,7 +17,7 @@
         @click="showLegacy = true"
       >
         旧版登录
-      </FormButton>
+      </FormButton> -->
     </div>
     <div v-else>
       <div class="text-foreground-2 mt-2 mb-4">

@@ -12,14 +12,14 @@ import { useHostAppStore } from '~/store/hostApp'
 
 const route = useRoute()
 const router = useRouter()
-const { getChallenge } = useAuthManager()
+const { getChallenge, getChallengeUrl } = useAuthManager()
 const { $accountBinding } = useNuxtApp()
 const hostApp = useHostAppStore()
 
 onMounted(async () => {
   try {
-    // const origin = getChallengeUrl()
-    const origin = 'http://47.100.77.97:64482'
+    const origin = getChallengeUrl()
+    // const origin = 'http://47.100.77.97:64482'
     const accessCode = route.query.access_code as string | undefined
     console.log(accessCode, 'accessCode')
     console.log(origin, 'origin')
@@ -36,7 +36,8 @@ onMounted(async () => {
 
       // Exchange the access code for a real token (optional)
       const response = await fetch(
-        new URL('http://47.100.77.97:64482/auth/token', origin),
+        // new URL('http://47.100.77.97:64482/auth/token', origin),
+        new URL('http://localhost:3000/auth/token', origin),
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

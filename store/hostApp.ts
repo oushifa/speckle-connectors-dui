@@ -425,31 +425,6 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     model.expired = false
     model.report = undefined
 
-    if (model.expired) {
-      // user sends via "Update" button
-      void trackEvent(
-        'Send',
-        {
-          expired: true,
-          actionSource: actionSource.toLowerCase(),
-          // eslint-disable-next-line camelcase
-          workspace_id: model.workspaceId
-        },
-        model.accountId
-      )
-    } else {
-      void trackEvent(
-        'Send',
-        {
-          expired: false,
-          actionSource: actionSource.toLowerCase(),
-          // eslint-disable-next-line camelcase
-          workspace_id: model.workspaceId
-        },
-        model.accountId
-      )
-    }
-
     // You should stop asking why if you saw anything related autocad..
     // It solves the press "escape" issue.
     // Because probably we don't give enough time to acad complete it's previos task and it stucks.

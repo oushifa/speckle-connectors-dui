@@ -53,7 +53,7 @@
         <HeaderUserMenu />
       </div>
     </div>
-    <FeedbackDialog v-model:open="showFeedbackDialog" />
+    <!-- <FeedbackDialog v-model:open="showFeedbackDialog" /> -->
     <SendWizard v-model:open="showSendDialog" @close="showSendDialog = false" />
     <ReceiveWizard
       v-model:open="showReceiveDialog"
@@ -68,7 +68,7 @@ import { useHostAppStore } from '~/store/hostApp'
 const app = useNuxtApp()
 const hostAppStore = useHostAppStore()
 const hasNoModelCards = computed(() => hostAppStore.projectModelGroups.length === 0)
-const showFeedbackDialog = ref<boolean>(false)
+// const showFeedbackDialog = ref<boolean>(false)
 const showSendDialog = ref<boolean>(false)
 const showReceiveDialog = ref<boolean>(false)
 
