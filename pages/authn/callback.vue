@@ -26,8 +26,8 @@ onMounted(async () => {
     if (accessCode && origin) {
       const challenge = getChallenge()
       const body = {
-        appId: 'sdui',
-        appSecret: 'sdui',
+        appId: 'DUI',
+        appSecret: 'DUI',
         accessCode,
         challenge
       }
