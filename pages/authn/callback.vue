@@ -26,8 +26,8 @@ onMounted(async () => {
     if (accessCode && origin) {
       const challenge = getChallenge()
       const body = {
-        appId: 'DUI',
-        appSecret: 'DUI',
+        appId: 'sdui',
+        appSecret: 'sdui',
         accessCode,
         challenge
       }
@@ -36,8 +36,8 @@ onMounted(async () => {
 
       // Exchange the access code for a real token (optional)
       const response = await fetch(
-        // new URL('http://47.100.77.97:64482/auth/token', origin),
-        new URL('http://localhost:3000/auth/token', origin),
+        new URL('http://47.100.77.97:64482/auth/token', origin),
+        // new URL('http://localhost:3000/auth/token', origin),
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

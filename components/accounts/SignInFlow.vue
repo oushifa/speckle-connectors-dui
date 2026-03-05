@@ -45,8 +45,8 @@ const logIn = () => {
     ? new URL(customServerUrl.value).origin
     : 'http://47.100.77.97:64482'
   const challenge = generateChallenge(serverUrl)
-  // const authUrl = `${serverUrl}/authn/verify/DUI/${challenge}`
-  const authUrl = `${serverUrl}/lowcef.html?appId=DUI&challenge=${challenge}`
+  // const authUrl = `${serverUrl}/authn/verify/sdui/${challenge}`
+  const authUrl = `${serverUrl}/lowcef.html?appId=sdui&challenge=${challenge}`
   window.location.href = authUrl
 }
 </script>
