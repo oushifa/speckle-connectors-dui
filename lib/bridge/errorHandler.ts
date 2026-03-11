@@ -22,10 +22,10 @@ export class BaseBridgeErrorHandler {
     store.setHostAppError(parsedData)
     const notification: ToastNotification = {
       type: ToastNotificationType.Danger,
-      title: 'Host App Error',
+      title: '应用程序错误',
       description: parsedData.message,
       cta: {
-        title: 'Show details',
+        title: '显示详细信息',
         onClick: () => (store.showErrorDialog = true)
       }
     }

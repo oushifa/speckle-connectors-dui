@@ -44,15 +44,15 @@ const props = withDefaults(
 const priorityText = computed(() => {
   switch (props.priority) {
     case 'high':
-      return 'High'
+      return '高'
     case 'medium':
-      return 'Medium'
+      return '中'
     case 'low':
-      return 'Low'
+      return '低'
     case 'none':
-      return 'No priority'
+      return '无优先级'
     case null:
-      return 'No priority'
+      return '无优先级'
     default:
       return ''
   }

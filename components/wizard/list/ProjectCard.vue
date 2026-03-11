@@ -15,7 +15,7 @@
       {{ project.name }}
     </div>
     <div class="text-body-3xs text-foreground-2">
-      {{ projectRole }}, updated {{ updatedAgo }}
+      {{ projectRole }}, 最后更新 {{ updatedAgo }}
     </div>
   </div>
 </template>
@@ -48,8 +48,8 @@ const hasAccess = computed(() =>
 
 const projectRole = computed(() => {
   if (hasAccess.value) {
-    return 'Can edit'
+    return '可编辑'
   }
-  return 'Can view'
+  return '可查看'
 })
 </script>

@@ -18,7 +18,7 @@
       <AutomateFunctionLogo :logo="functionRun.function?.logo" size="xs" />
       <div class="font-medium text-xs truncate">
         {{ automationName ? automationName + ' / ' : ''
-        }}{{ functionRun.function?.name || 'Unknown function' }}
+        }}{{ functionRun.function?.name || '未知函数' }}
       </div>
 
       <div class="h-full grow flex justify-end">
@@ -48,7 +48,7 @@
           Function is {{ functionRun.status.toLowerCase() }}.
         </div>
         <div v-else class="text-xs text-foreground-2 italic">
-          {{ functionRun.statusMessage || 'No status message' }}
+          {{ functionRun.statusMessage || '没有状态消息' }}
         </div>
       </div>
 

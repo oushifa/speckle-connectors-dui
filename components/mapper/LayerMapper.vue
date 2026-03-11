@@ -7,7 +7,7 @@
         :key="selectedLayers.length === 0 ? 'empty' : 'hasSelection'"
         :model-value="selectedLayers"
         name="layerSelection"
-        label="Select layers"
+        label="选择图层"
         class="w-full"
         fixed-height
         size="sm"
@@ -36,15 +36,11 @@
         v-if="selectedLayers.length === 0"
         class="space-y-2 p-2 bg-highlight-1 rounded-md text-body-xs"
       >
-        <div class="text-foreground-2">
-          No layers selected, choose layers from the dropdown above!
-        </div>
+        <div class="text-foreground-2">未选择图层，从上面的下拉菜单中选择图层！</div>
       </div>
       <div v-else class="space-y-2 p-2 bg-highlight-1 rounded-md text-body-xs">
         <div>
-          Selected {{ selectedLayers.length }} layer{{
-            selectedLayers.length !== 1 ? 's' : ''
-          }}:
+          已选择 {{ selectedLayers.length }} 图层:
           {{ selectedLayers.map((l) => l.name).join(', ') }}
         </div>
       </div>

@@ -9,10 +9,8 @@
       <FormButton
         v-tippy="
           isExpired
-            ? 'A new version was pushed ' +
-              latestVersionCreatedAt +
-              '. Click to load a different version.'
-            : 'Load a different version'
+            ? '新的版本已推送 ' + latestVersionCreatedAt + '. 点击加载不同版本。'
+            : '加载不同版本'
         "
         :icon-left="ClockIcon"
         size="sm"
@@ -23,7 +21,7 @@
         @click.stop="openVersionsDialog = true"
       >
         <span>
-          Loaded
+          已加载
           <b>version</b>
         </span>
         &nbsp;from&nbsp;
@@ -44,7 +42,7 @@
     <CommonDialog
       v-model:open="openVersionsDialog"
       fullscreen="none"
-      title="Change loaded version"
+      title="更改已加载版本"
     >
       <WizardVersionSelector
         :account-id="modelCard.accountId"
@@ -136,10 +134,10 @@ const receiveSettingsMissingNotification = computed(() => {
   const notification = {} as ModelCardNotification
   notification.dismissible = false
   notification.level = 'danger'
-  notification.text = 'Load settings are corrupted for some reason.'
+  notification.text = '接收设置已损坏，无法加载。'
 
   notification.cta = {
-    name: 'Refresh',
+    name: '刷新',
     action: async () => {
       await store.patchModel(props.modelCard.modelCardId, {
         settings: store.receiveSettings
@@ -235,9 +233,9 @@ const failRate = computed(() => {
 
 const receiveResultNotificationText = computed(() => {
   if (failRate.value > 80) {
-    return 'Model loaded. Some objects have failed to convert!'
+    return '模型已加载。部分对象转换失败！'
   }
-  return 'Model loaded!'
+  return '模型已加载！'
 })
 
 const receiveResultNotification = computed(() => {

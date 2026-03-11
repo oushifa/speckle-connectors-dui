@@ -11,11 +11,7 @@
           <CubeTransparentIcon class="w-5 h-5 text-foreground-2" />
         </div>
         <div v-else-if="previewUrl" class="h-12 w-12">
-          <img
-            :src="previewUrl"
-            alt="preview image for model"
-            class="h-12 w-12 object-cover"
-          />
+          <img :src="previewUrl" alt="预览图片" class="h-12 w-12 object-cover" />
         </div>
         <div
           v-else
@@ -36,7 +32,7 @@
         </div>
 
         <div class="text-body-3xs text-foreground-2 truncate flex space-x-2">
-          <div>updated {{ updatedAgo }}</div>
+          <div>最后更新 {{ updatedAgo }}</div>
         </div>
       </div>
       <div class="space-y-2 max-[275px]:hidden">

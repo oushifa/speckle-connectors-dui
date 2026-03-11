@@ -37,11 +37,11 @@ const props = withDefaults(
 const statusText = computed(() => {
   switch (props.status) {
     case 'open':
-      return 'Open'
+      return '打开'
     case 'readyForReview':
-      return 'Ready for review'
+      return '待审核'
     case 'resolved':
-      return 'Resolved'
+      return '已解决'
     default:
       return ''
   }

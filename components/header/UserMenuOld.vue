@@ -2,7 +2,7 @@
   <div>
     <Menu as="div" class="ml-1 flex items-center z-100">
       <MenuButton v-slot="{ open }">
-        <span class="sr-only">Open user menu</span>
+        <span class="sr-only">打开用户菜单</span>
         <button
           class="rounded-full transition hover:bg-primary hover:text-foreground-on-primary p-1"
         >
@@ -28,7 +28,7 @@
                 'my-1 text-body-xs flex px-2 py-1 text-foreground cursor-pointer transition mx-1 rounded'
               ]"
             >
-              Feedback
+              反馈
             </div>
           </MenuItem>
           <MenuItem v-slot="{ active }" @click="toggleTheme">
@@ -38,7 +38,7 @@
                 'my-1 text-body-xs flex px-2 py-1 text-foreground cursor-pointer transition mx-1 rounded'
               ]"
             >
-              {{ isDarkTheme ? 'Light mode' : 'Dark mode' }}
+              {{ isDarkTheme ? '亮色模式' : '暗色模式' }}
             </div>
           </MenuItem>
           <div v-if="hasConfigBindings && isDevMode">
@@ -50,7 +50,7 @@
                     'my-1 text-body-xs flex px-2 py-1 text-foreground cursor-pointer transition mx-1 rounded'
                   ]"
                 >
-                  Open Dev Tools
+                  打开开发工具
                 </div>
               </MenuItem>
             </div>
@@ -62,14 +62,14 @@
                   'text-body-xs flex px-2 py-1 text-foreground cursor-pointer transition mx-1 rounded'
                 ]"
               >
-                Test Page
+                测试页面
               </NuxtLink>
             </MenuItem>
           </div>
           <div class="border-t border-outline-3 py-1 mt-1">
             <MenuItem>
               <div class="px-3 pt-1 text-tiny text-foreground-2">
-                Version {{ hostApp.connectorVersion }}
+                版本 {{ hostApp.connectorVersion }}
               </div>
             </MenuItem>
           </div>

@@ -13,17 +13,17 @@ const jsonSchema = {
   properties: {
     acceptTerms: {
       type: 'boolean',
-      title: 'I accept the terms and conditions'
+      title: '我同意条款和条件'
     },
-    username: { type: 'string', title: 'Username', default: 'a' },
+    username: { type: 'string', title: '用户名', default: 'a' },
     color: {
       type: 'string',
-      title: 'Favorite Color',
+      title: '最喜欢的颜色',
       enum: ['red', 'green', 'blue']
     },
     multiSelect: {
       type: 'array',
-      title: 'Multi Favorite Chars',
+      title: '多选择最喜欢的字符',
       enum: ['a', 'b', 'c', 'd']
     }
   }

@@ -39,8 +39,7 @@
   <CommonDialog v-model:open="showRemoveAccountDialog" fullscreen="none">
     <template #header>Remove Account</template>
     <div class="text-xs mb-4">
-      Removing the account will remove the related model cards from your file. Do you
-      want to remove the account?
+      删除账户将删除与该账户相关的模型卡片。您确定要删除该账户吗？
     </div>
     <div class="flex justify-between center py-2 space-x-3">
       <FormButton
@@ -49,11 +48,9 @@
         full-width
         @click="showRemoveAccountDialog = false"
       >
-        No
+        否
       </FormButton>
-      <FormButton size="sm" full-width @click="handleRemove(account)">
-        Remove
-      </FormButton>
+      <FormButton size="sm" full-width @click="handleRemove(account)">删除</FormButton>
     </div>
   </CommonDialog>
 </template>

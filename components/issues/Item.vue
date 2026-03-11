@@ -11,7 +11,7 @@
       <div class="flex items-center">
         <FormButton
           v-if="store.hostAppName !== 'navisworks' && store.hostAppName !== 'etabs'"
-          v-tippy="'Highlight'"
+          v-tippy="'高亮模型'"
           color="subtle"
           :icon-left="CursorArrowRaysIcon"
           hide-text
@@ -19,7 +19,7 @@
           @click.stop="highlightModel"
         />
         <FormButton
-          v-tippy="'Open issue in browser'"
+          v-tippy="'在浏览器中打开问题'"
           color="subtle"
           :icon-left="ArrowTopRightOnSquareIcon"
           hide-text
@@ -91,7 +91,7 @@ type IssueViewerState = {
 const highlightModel = async () => {
   if (!props.issue.viewerState) {
     store.setNotification({
-      title: 'Objects not found to highlight',
+      title: '未找到要高亮的对象',
       type: ToastNotificationType.Info
     })
     return
@@ -116,7 +116,7 @@ const highlightModel = async () => {
     await app.$baseBinding.highlightObjects(appIdsToHighlight)
   } else {
     store.setNotification({
-      title: 'Objects not found to highlight on this model.',
+      title: '未找到要高亮的对象在该模型中',
       type: ToastNotificationType.Info
     })
   }

@@ -57,7 +57,7 @@
       dot-icon-color-classes="animate-ping"
       class="absolute top-1 right-1 shadow"
     >
-      Latest
+      最新版本
     </CommonBadge>
     <CommonBadge
       v-if="selectedVersionId === version.id"
@@ -65,7 +65,7 @@
       color-classes="bg-foundation"
       class="absolute top-1 right-1 shadow"
     >
-      Current
+      当前版本
     </CommonBadge>
     <!-- Warning if obj is coming from the v2 side -->
     <!-- <div v-if="!objectVersion" class="bottom-0 left-0">

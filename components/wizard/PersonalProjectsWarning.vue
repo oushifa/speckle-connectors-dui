@@ -9,15 +9,13 @@
             <h1
               class="mb-1 text-sm font-semibold w-full inline-block py-1 bg-clip-text"
             >
-              Move your projects to a workspace
+              迁移您的项目到工作空间
             </h1>
             <p class="mb-2">
               <span class="text-xs">
-                Personal projects are being phased out. Move your projects to a
-                workspace to create new projects and models, invite new project
-                collaborators, and view comments and versions older than 7 days. By
-                January 1st 2026, all projects will be archived if not moved into a
-                workspace.
+                个人项目将在 2026 年 1 月 1
+                日归档。迁移到工作空间以创建新项目、模型、邀请新项目协作者、查看 7
+                天前的评论和版本。
               </span>
             </p>
 
@@ -31,7 +29,7 @@
                 )
               "
             >
-              Move projects
+              迁移项目
             </FormButton>
           </div>
         </div>

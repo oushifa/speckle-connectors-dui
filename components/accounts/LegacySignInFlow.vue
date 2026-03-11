@@ -53,8 +53,7 @@
     </div>
     <div v-else class="space-y-3">
       <div class="text-foreground-2 text-sm">
-        需要 Speckle Desktop Service
-        才能以旧版方式添加账户。该后台服务负责安全身份验证。
+        需要桌面服务软件才能以旧版方式添加账户。该后台服务负责安全身份验证。
       </div>
       <div class="flex space-x-2">
         <FormButton

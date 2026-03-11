@@ -34,7 +34,7 @@ export const useFunctionRunsStatusSummary = (params: {
       passed: 0,
       inProgress: 0,
       total: allFunctionRuns.length,
-      title: 'All runs passed.',
+      title: '所有运行都已完成',
       titleColor: 'text-success',
       longSummary: ''
     }
@@ -48,13 +48,13 @@ export const useFunctionRunsStatusSummary = (params: {
         case AutomateRunStatus.Exception:
         case AutomateRunStatus.Timeout:
         case AutomateRunStatus.Canceled:
-          result.title = 'Some runs failed.'
+          result.title = '有一些运行失败'
           result.titleColor = 'text-danger'
           result.failed++
           break
         default:
           if (result.failed === 0) {
-            result.title = 'Some runs are still in progress.'
+            result.title = '有一些运行仍在进行中'
             result.titleColor = 'text-warning'
           }
           result.inProgress++
@@ -67,14 +67,14 @@ export const useFunctionRunsStatusSummary = (params: {
     // 1 passed, 2 in progress, 1 failed runs
     // 1 passed run
     const longSummarySegments = []
-    if (result.passed > 0) longSummarySegments.push(`${result.passed} passed`)
+    if (result.passed > 0) longSummarySegments.push(`${result.passed} 个运行已通过`)
     if (result.inProgress > 0)
-      longSummarySegments.push(`${result.inProgress} in progress`)
-    if (result.failed > 0) longSummarySegments.push(`${result.failed} failed`)
+      longSummarySegments.push(`${result.inProgress} 个运行仍在进行中`)
+    if (result.failed > 0) longSummarySegments.push(`${result.failed} 个运行失败`)
 
     result.longSummary = (
-      longSummarySegments.join(', ') + ` run${result.total > 1 ? 's' : ''}.`
-    ).replace(/,(?=[^,]+$)/, ', and')
+      longSummarySegments.join(', ') + ` 个运行${result.total > 1 ? 's' : ''}.`
+    ).replace(/,(?=[^,]+$)/, ', 和')
 
     return result
   })

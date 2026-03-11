@@ -7,7 +7,7 @@
     :filter-predicate="searchFilterPredicate"
     :label="label"
     :name="label"
-    placeholder="Nothing selected"
+    placeholder="没有选中任何对象"
     class="w-full"
     fixed-height
     show-label

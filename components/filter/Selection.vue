@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-2 p-2 bg-highlight-1 rounded-md text-body-xs">
     <div v-if="selectionStore.selectionInfo.selectedObjectIds?.length === 0">
-      No objects selected, go ahead and select some from your model!
+      没有选中任何对象，请从模型中选择一些对象！
     </div>
     <div v-else>{{ selectionStore.selectionInfo.summary }}</div>
   </div>

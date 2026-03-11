@@ -9,7 +9,7 @@
         <CommonIconsArrowFilled
           :class="`w-5 ${showSettings ? '' : '-rotate-90'} transition`"
         />
-        <div class="text-body-sm text-left select-none">Settings</div>
+        <div class="text-body-sm text-left select-none">发布设置</div>
       </div>
     </button>
     <div v-show="showSettings" class="px-1">

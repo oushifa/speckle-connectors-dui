@@ -10,7 +10,7 @@
   >
     <div class="flex max-[275px]:w-full overflow-hidden my-2">
       <FormButton
-        v-tippy="'Edit what gets published'"
+        v-tippy="'更改要发布的内容'"
         :icon-left="Square3Stack3DIcon"
         size="sm"
         color="subtle"
@@ -49,20 +49,20 @@
 
     <CommonDialog
       v-model:open="showSetMessageDialog"
-      title="Version message"
+      title="版本信息"
       fullscreen="none"
     >
       <form @submit="setVersionMessage(versionMessage as string)">
         <div class="text-body-2xs mb-2 ml-1">
-          Describe your latest changes to help keep track of design intent.
+          描述您最新的变更，以帮助跟踪设计意图。
         </div>
         <FormTextArea
           v-model="versionMessage"
           class="text-xs"
-          placeholder="Moved elements to prevent clash"
+          placeholder="移动元素以防止冲突"
           autocomplete="off"
           name="name"
-          label="Version message"
+          label="版本信息"
           color="foundation"
           :show-clear="!!versionMessage"
           :rules="[ValidationHelpers.isStringOfLength({ minLength: 3 })]"
@@ -71,7 +71,7 @@
         <CommonLoadingBar v-if="isUpdatingVersionMessage" loading />
         <div class="mt-4 flex justify-end items-center space-x-2 w-full">
           <FormButton size="sm" text @click="showSetMessageDialog = false">
-            Cancel
+            取消
           </FormButton>
           <FormButton
             size="sm"
@@ -80,7 +80,7 @@
               isUpdatingVersionMessage || !versionMessage || versionMessage.length < 3
             "
           >
-            Save
+            保存
           </FormButton>
         </div>
       </form>
@@ -266,8 +266,8 @@ const setVersionMessage = async (message: string) => {
   } else {
     store.setNotification({
       type: ToastNotificationType.Danger,
-      title: 'Request failed',
-      description: 'Failed to update version message.',
+      title: '请求失败',
+      description: '更新版本信息失败。',
       autoClose: true
     })
   }
@@ -289,10 +289,10 @@ const sendSettingsMissingNotification = computed(() => {
   const notification = {} as ModelCardNotification
   notification.dismissible = false
   notification.level = 'danger'
-  notification.text = 'Publish settings are corrupted for some reason.'
+  notification.text = '发布设置已损坏，原因未知。'
 
   notification.cta = {
-    name: 'Refresh',
+    name: '刷新',
     action: async () => {
       await store.patchModel(props.modelCard.modelCardId, {
         settings: store.sendSettings
@@ -309,15 +309,15 @@ const expiredNotification = computed(() => {
   notification.dismissible = false
   notification.level = props.modelCard.progress ? 'info' : 'info'
   notification.text = props.modelCard.progress
-    ? 'Model changed while publishing'
-    : 'Out of sync with application'
+    ? '模型在发布时已更改'
+    : '与应用程序不同步'
 
-  const ctaType = props.modelCard.progress ? 'Restart' : 'Update'
+  const ctaType = props.modelCard.progress ? '重新启动' : '更新'
   notification.cta = {
     name: ctaType,
     disabled: !canCreateVersionPerm.value,
     tooltipText: !canCreateVersionPerm.value
-      ? canCreateVersionMessage.value || 'Publish limit reached'
+      ? canCreateVersionMessage.value || '发布限制已达'
       : undefined,
     action: async () => {
       hasSetVersionMessage.value = false
@@ -351,9 +351,9 @@ const failRate = computed(() => {
 
 const sendResultNotificationText = computed(() => {
   if (failRate.value > 80) {
-    return 'Version created. Some objects have failed to convert!'
+    return '版本已创建。部分对象转换失败！'
   }
-  return 'Version created!'
+  return '版本已创建！'
 })
 
 const sendResultNotificationLevel = computed(() => {
@@ -378,8 +378,8 @@ const latestVersionNotification = computed(() => {
     !hasSetVersionMessage.value
   ) {
     notification.secondaryCta = {
-      name: 'Set message',
-      tooltipText: 'Describe your changes',
+      name: '设置信息',
+      tooltipText: '描述您的更改',
       action: () => {
         showSetMessageDialog.value = true
         versionMessage.value = ''
@@ -388,8 +388,8 @@ const latestVersionNotification = computed(() => {
   }
 
   notification.cta = {
-    name: 'View',
-    tooltipText: 'Check your model in the browser!',
+    name: '查看',
+    tooltipText: '在浏览器中查看模型！',
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
     action: () => cardBase.value?.viewModel()
   }

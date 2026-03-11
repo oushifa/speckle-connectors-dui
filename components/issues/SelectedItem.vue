@@ -2,7 +2,7 @@
   <div class="flex flex-col space-y-1.5">
     <div class="flex flex-col items-start space-y-2 p-2">
       <div class="line-clamp-2 font-medium text-body text-foreground">
-        {{ issue.title ? issue.title : 'No title' }}
+        {{ issue.title ? issue.title : '无标题' }}
       </div>
       <IssuesBasicTiptap
         v-if="issue.description?.doc"
@@ -15,7 +15,7 @@
         <div class="flex items-center justify-between space-x-1">
           <UserAvatar :user="issue.assignee?.user" size="xs" />
           <span class="text-body-3xs text-foreground-2 font-medium">
-            {{ issue.assignee ? issue.assignee?.user.name : 'No assignee' }}
+            {{ issue.assignee ? issue.assignee?.user.name : '无负责人' }}
           </span>
         </div>
         <IssuesLabels :labels="issue.labels" />
@@ -27,7 +27,7 @@
         </div>
         <div v-else class="flex items-center gap-1 h-6">
           <Calendar class="text-foreground-2 shrink-0" :stroke-width="1.5" :size="12" />
-          <span class="text-body-3xs text-foreground-2 font-medium">No due date</span>
+          <span class="text-body-3xs text-foreground-2 font-medium">无截止日期</span>
         </div>
       </div>
       <div

@@ -151,9 +151,8 @@ export class ArchicadBridge {
 
     if (!isDesktopServiceAvailable) {
       const notification: ToastNotification = {
-        title: 'Desktop service unavailable',
-        description:
-          'Falling back to a slower load process because the desktop service is not running.',
+        title: '桌面服务不可用',
+        description: '因为桌面服务未运行，所以会使用较慢的加载进程。',
         type: ToastNotificationType.Info
       }
       hostAppStore.setNotification(notification)
@@ -233,7 +232,7 @@ export class ArchicadBridge {
       )
     } catch (error) {
       const notification: ToastNotification = {
-        title: 'Load failed',
+        title: '加载失败',
         description: error as string,
         type: ToastNotificationType.Danger
       }
@@ -509,7 +508,7 @@ export class ArchicadBridge {
         const errorReason = res?.statusData.errorReason || 'Unknown error'
         hostAppStore.setNotification({
           type: ToastNotificationType.Danger,
-          title: 'Ingestion Failed',
+          title: 'Ingestion 失败',
           description: errorReason
         })
         throw new Error(`Ingestion failed: ${errorReason}.`)
@@ -517,12 +516,10 @@ export class ArchicadBridge {
 
       hostAppStore.setNotification({
         type: ToastNotificationType.Danger,
-        title: 'Ingestion Error',
-        description: 'Ingestion status does not match expected types.'
+        title: 'Ingestion 错误',
+        description: 'Ingestion 状态与预期类型不匹配。'
       })
-      throw new Error(
-        `Ingestion status does not match with the expected types as success or failure.`
-      )
+      throw new Error(`Ingestion 状态与预期类型不匹配，预期为成功或失败。`)
     } else {
       const accountStore = useAccountStore()
       const account = accountStore.getAccountClient(args.accountId)

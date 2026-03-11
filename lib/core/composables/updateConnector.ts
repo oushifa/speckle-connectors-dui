@@ -38,7 +38,7 @@ export function useUpdateConnector() {
       console.error(e)
       const notification: ToastNotification = {
         type: ToastNotificationType.Danger,
-        title: `No version found to check update!`
+        title: `检查更新失败`
       }
       hostApp.setNotification(notification)
     }

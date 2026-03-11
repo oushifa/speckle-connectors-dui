@@ -3,7 +3,7 @@
     <slot name="activator" :toggle="toggleDialog"></slot>
     <CommonDialog
       v-model:open="showAutomateReportDialog"
-      :title="`Automation Report`"
+      :title="`自动化报告`"
       fullscreen="none"
     >
       <div v-if="props.automationRuns" class="space-y-2">

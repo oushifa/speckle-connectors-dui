@@ -1,7 +1,7 @@
 <template>
   <div class="p-0">
     <slot name="activator" :toggle="toggleDialog"></slot>
-    <CommonDialog v-model:open="showIssuesDialog" :title="`Issues`" fullscreen="none">
+    <CommonDialog v-model:open="showIssuesDialog" :title="`问题`" fullscreen="none">
       <div class="flex flex-col space-y-2">
         <div v-if="selectedIssue" class="flex flex-col space-y-1.5">
           <div class="relative flex items-center h-8">
@@ -19,7 +19,7 @@
             </div>
             <div class="absolute right-0">
               <FormButton
-                v-tippy="'Open issue in browser'"
+                v-tippy="'在浏览器中打开问题'"
                 color="outline"
                 hide-text
                 :icon-left="ArrowTopRightOnSquareIcon"

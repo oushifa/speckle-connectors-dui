@@ -138,9 +138,7 @@ const projectAccount = computed(() =>
 
 const isPersonalProject = computed(() => !projectDetails.value?.workspace)
 const projectNavigatorTippy = computed(() =>
-  isPersonalProject.value
-    ? 'Move personal project into a workspace'
-    : 'Open project in browser'
+  isPersonalProject.value ? '将个人项目移动到工作空间' : '在浏览器中打开项目'
 )
 
 const clientId = projectAccount.value.accountInfo.id
