@@ -210,6 +210,8 @@ import { useAccountStore } from '~~/store/accounts'
 import { useHostAppStore } from '~~/store/hostApp'
 import { useConfigStore } from '~~/store/config'
 import { useMixpanel } from '~/lib/core/composables/mixpanel'
+import getConfig from '~/env-config'
+
 const app = useNuxtApp()
 const config = useConfigStore()
 
@@ -261,6 +263,6 @@ const reload = () => {
 }
 
 const openSpeckleConnectors = () => {
-  window.open('http://47.100.77.97:64482/connectors', '_blank')
+  window.open(getConfig('serverUrl') + '/connectors', '_blank')
 }
 </script>

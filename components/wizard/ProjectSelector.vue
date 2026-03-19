@@ -8,7 +8,7 @@
             <FormButton
               full-width
               class="flex items-center"
-              @click="$openUrl('http://47.100.77.97:64482/workspaces/actions/create')"
+              @click="$openUrl(getConfig('serverUrl') + '/workspaces/actions/create')"
             >
               <div class="min-w-0 truncate flex-grow">
                 <span>{{ '创建工作区' }}</span>
@@ -222,6 +222,7 @@ import type {
 import { useMixpanel } from '~/lib/core/composables/mixpanel'
 import { useConfigStore } from '~/store/config'
 import { useHostAppStore } from '~/store/hostApp'
+import getConfig from '~/env-config'
 
 const hostAppStore = useHostAppStore()
 const { trackEvent } = useMixpanel()

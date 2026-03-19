@@ -187,12 +187,6 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     documentModelStore.value.models = documentModelStore.value.models.filter(
       (item) => item.modelCardId !== model.modelCardId
     )
-
-    void trackEvent(
-      'DUI3 Action',
-      { name: 'Remove Model Card', type: model.typeDiscriminator },
-      model.accountId
-    )
   }
 
   const removeAccountModels = async (accountId: string) => {

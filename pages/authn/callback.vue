@@ -9,6 +9,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthManager } from '~/lib/authn/useAuthManager'
 import type { Account } from '~/lib/bindings/definitions/IAccountBinding'
 import { useHostAppStore } from '~/store/hostApp'
+import getConfig from '~/env-config'
 
 const route = useRoute()
 const router = useRouter()
@@ -36,7 +37,7 @@ onMounted(async () => {
 
       // Exchange the access code for a real token (optional)
       const response = await fetch(
-        new URL('http://47.100.77.97:64482/auth/token', origin),
+        new URL(getConfig('serverUrl') + '/auth/token', origin),
         // new URL('http://localhost:3000/auth/token', origin),
         {
           method: 'POST',

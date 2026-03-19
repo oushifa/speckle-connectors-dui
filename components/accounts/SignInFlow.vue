@@ -13,7 +13,7 @@
         v-model="customServerUrl"
         name="name"
         :show-label="false"
-        placeholder="http://47.100.77.97:64482"
+        placeholder=""
         color="foundation"
         autocomplete="off"
         show-clear
@@ -29,8 +29,9 @@
 import { ref } from 'vue'
 import { useAuthManager } from '~/lib/authn/useAuthManager'
 import type { BaseBridge } from '~/lib/bridge/base'
+import getConfig from '~/env-config'
 
-const customServerUrl = ref<string | undefined>('http://47.100.77.97:64482')
+const customServerUrl = ref<string | undefined>('')
 const showCustomServerInput = ref(false)
 
 const { $accountBinding } = useNuxtApp()
@@ -43,7 +44,7 @@ const { generateChallenge } = useAuthManager()
 const logIn = () => {
   const serverUrl = customServerUrl.value
     ? new URL(customServerUrl.value).origin
-    : 'http://47.100.77.97:64482'
+    : getConfig('serverUrl')
   const challenge = generateChallenge(serverUrl)
   // const authUrl = `${serverUrl}/authn/verify/sdui/${challenge}`
   const authUrl = `${serverUrl}/lowcef.html?appId=sdui&challenge=${challenge}`

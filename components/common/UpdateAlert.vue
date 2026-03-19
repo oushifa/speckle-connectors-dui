@@ -5,7 +5,8 @@
       store.latestAvailableVersion &&
       !store.isConnectorUpToDate &&
       !hasDismissedAlert &&
-      !store.isUpdateNotificationDisabled
+      !store.isUpdateNotificationDisabled &&
+      false
     "
     v-tippy="'版本: ' + store.latestAvailableVersion?.Number + ', 发布于 ' + createdAgo"
     color="neutral"
