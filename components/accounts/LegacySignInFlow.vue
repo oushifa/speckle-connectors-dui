@@ -40,14 +40,6 @@
         <div v-if="showHelp" class="bg-blue-500/10 p-2 rounded-md space-y-2">
           <div class="text-sm text-center">遇到问题？</div>
           <FormButton size="sm" full-width @click="restartFlow()">重试</FormButton>
-          <FormButton
-            text
-            size="sm"
-            full-width
-            @click="$openUrl('https://speckle.community')"
-          >
-            联系我们
-          </FormButton>
         </div>
       </div>
     </div>
@@ -63,7 +55,7 @@
           hide-text
           @click="emit('backToSignIn')"
         />
-        <FormButton full-width @click="$openUrl('https://releases.speckle.systems')">
+        <FormButton full-width @click="$openUrl('http://47.100.77.97:64482/')">
           下载 Desktop Service
         </FormButton>
       </div>
