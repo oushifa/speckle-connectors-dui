@@ -2,7 +2,7 @@
   <div class="flex flex-col space-y-2">
     <div class="px-2 space-y-1">
       <FormButton to="/" size="sm" :icon-left="ArrowLeftIcon" class="my-1">
-        Home
+        首页
       </FormButton>
       <hr />
     </div>
@@ -14,7 +14,7 @@
         <FormSelectBase
           :model-value="selectedMappingMode"
           name="mappingMode"
-          label="Assign by"
+          label="映射模式"
           class="w-full"
           fixed-height
           size="sm"
@@ -212,7 +212,10 @@ const { trackEvent } = useMixpanel()
 
 // === STATE ===
 const selectedMappingMode = ref<string | undefined>(undefined)
-const mappingModeOptions = ['Selection', 'Layer']
+const mappingModeOptions = [
+  { label: '选择', value: 'Selection' },
+  { label: '层', value: 'Layer' }
+]
 const categoryOptions = ref<Category[]>([])
 const mappings = ref<CategoryMapping[]>([])
 
@@ -258,18 +261,14 @@ const currentLayerMappings = computed(() => {
 
 const dropdownPlaceholder = computed(() => {
   if (revitMapperStore.categoryStatus) {
-    return revitMapperStore.categoryStatus?.isMultiple
-      ? 'Multiple categories'
-      : 'Select a category'
+    return revitMapperStore.categoryStatus?.isMultiple ? '多个分类' : '选择一个分类'
   }
   return undefined
 })
 
 const displayLabel = computed(() => {
   const multiple = revitMapperStore.categoryStatus?.isMultiple
-  return multiple
-    ? 'Multiple categories'
-    : revitMapperStore.selectedCategory?.label || ''
+  return multiple ? '多个分类' : revitMapperStore.selectedCategory?.label || ''
 })
 
 // === METHODS ===
@@ -288,12 +287,12 @@ const handleModeChange = (newMode: string) => {
   if (newMode === 'Layer' && mappings.value.length > 0) {
     // Switching to Layer mode with existing object mappings
     pendingMode.value = newMode
-    conflictMessage.value = `Switching to Layer assignment mode will clear all current object category assignments. Continue?`
+    conflictMessage.value = `切换到层映射模式将清除所有对象分类映射。是否继续？`
     showModeConfirmDialog.value = true
   } else if (newMode === 'Selection' && layerMappings.value.length > 0) {
     // Switching to Selection mode with existing layer mappings
     pendingMode.value = newMode
-    conflictMessage.value = `Switching to Selection assignment mode will clear all current layer category assignments. Continue?`
+    conflictMessage.value = `切换到选择映射模式将清除所有层分类映射。是否继续？`
     showModeConfirmDialog.value = true
   } else {
     // No conflicts, switch directly (no existing mappings or switching to same mode)
@@ -321,7 +320,7 @@ const confirmModeChange = async () => {
 
     // Track the manual mode switch
     trackEvent('DUI3 Action', {
-      name: 'Mapper Mode Changed',
+      name: '映射模式切换',
       mode: selectedMappingMode.value
     })
 
@@ -334,7 +333,7 @@ const confirmModeChange = async () => {
     pendingMode.value = ''
     conflictMessage.value = ''
   } catch (error) {
-    console.error('Failed to clear category assignments during mode switch:', error)
+    console.error('切换映射模式时清除分类映射失败:', error)
   }
 }
 
@@ -378,7 +377,7 @@ const assignToCategory = async () => {
     selectedCategory.value = undefined
     await refreshMappings()
   } catch (error) {
-    console.error('Failed to assign to category:', error)
+    console.error('分配分类失败:', error)
   }
 }
 
@@ -388,7 +387,7 @@ const clearMapping = async (mapping: CategoryMapping) => {
     await $revitMapperBinding?.clearObjectsCategoryAssignment(mapping.objectIds)
     await refreshMappings()
   } catch (error) {
-    console.error('Failed to clear category assignment:', error)
+    console.error('清除分类映射失败:', error)
   }
 }
 
@@ -398,7 +397,7 @@ const clearAllMappings = async () => {
     await $revitMapperBinding?.clearAllObjectsCategoryAssignments()
     await refreshMappings()
   } catch (error) {
-    console.error('Failed to clear all category assignments:', error)
+    console.error('清除所有分类映射失败:', error)
   }
 }
 
@@ -408,7 +407,7 @@ const clearLayerMapping = async (layerMapping: LayerCategoryMapping) => {
     await $revitMapperBinding?.clearLayerCategoryAssignment(layerMapping.layerIds)
     await refreshMappings()
   } catch (error) {
-    console.error('Failed to clear layer assignment:', error)
+    console.error('清除层分类映射失败:', error)
   }
 }
 
@@ -418,7 +417,7 @@ const clearAllLayerMappings = async () => {
     await $revitMapperBinding?.clearAllLayerCategoryAssignments()
     await refreshMappings()
   } catch (error) {
-    console.error('Failed to clear all layer assignments:', error)
+    console.error('清除所有层分类映射失败:', error)
   }
 }
 
@@ -427,7 +426,7 @@ const selectMappedObjects = async (mapping: CategoryMapping) => {
   try {
     await $baseBinding?.highlightObjects(mapping.objectIds)
   } catch (error) {
-    console.error('Failed to highlight objects:', error)
+    console.error('高亮对象失败:', error)
   }
 }
 
@@ -463,7 +462,7 @@ const selectMappedLayers = async (layerMapping: LayerCategoryMapping) => {
     // 4. Update reactive state
     currentCategories.value = [layerMapping.categoryValue]
   } catch (error) {
-    console.error('Failed to highlight effective objects:', error)
+    console.error('高亮有效对象失败:', error)
   }
 }
 
@@ -475,7 +474,7 @@ const selectAllMappedObjects = async () => {
       await $baseBinding?.highlightObjects(allObjectIds)
     }
   } catch (error) {
-    console.error('Failed to select all objects with categories assigned:', error)
+    console.error('高亮所有分类映射对象失败失败:', error)
   }
 }
 
@@ -500,10 +499,7 @@ const selectAllMappedLayers = async () => {
       await $baseBinding?.highlightObjects(uniqueObjectIds)
     }
   } catch (error) {
-    console.error(
-      'Failed to select all objects with categories assigned by layer:',
-      error
-    )
+    console.error('高亮所有层分类映射对象失败失败:', error)
   }
 }
 
@@ -545,16 +541,14 @@ const loadData = async () => {
         // Mixed state detected - this shouldn't happen, but default to Selection
         // and let the conflict handling take care of it
         selectedMappingMode.value = 'Selection'
-        console.warn(
-          'Mixed assignment state detected - both object and layer assignments exist'
-        )
+        console.warn('混合映射状态检测到 - 存在对象和层映射')
       } else {
         // No existing mappings - default to Selection mode
         selectedMappingMode.value = 'Selection'
       }
     }
   } catch (error) {
-    console.error('Failed to load categorizer data:', error)
+    console.error('加载分类映射数据失败:', error)
     // Fallback to Selection mode if loading fails
     if (!selectedMappingMode.value) {
       selectedMappingMode.value = 'Selection'
@@ -566,7 +560,7 @@ const loadData = async () => {
 const refreshMappings = async () => {
   try {
     if (!$revitMapperBinding) {
-      console.warn('No Revit category assignment binding available')
+      console.warn('Revit分类映射绑定不可用')
       return
     }
 
@@ -586,7 +580,7 @@ const refreshMappings = async () => {
       categoryLabel: getCategoryLabel(mapping.categoryValue)
     }))
   } catch (error) {
-    console.error('Failed to refresh category assignments:', error)
+    console.error('刷新分类映射失败:', error)
   }
 }
 
@@ -597,7 +591,7 @@ const loadAvailableLayers = async (): Promise<LayerOption[]> => {
     const layers = (await $revitMapperBinding?.getAvailableLayers()) || []
     return layers
   } catch (error) {
-    console.error('Failed to load layers:', error)
+    console.error('加载层失败:', error)
     return []
   }
 }
@@ -687,7 +681,7 @@ const refreshLayerMappings = async () => {
       categoryLabel: getCategoryLabel(mapping.categoryValue)
     }))
   } catch (error) {
-    console.error('Failed to refresh layer category assignments:', error)
+    console.error('刷新层分类映射失败:', error)
   }
 }
 </script>

@@ -21,7 +21,7 @@
       />
       <div class="min-w-0 grow">
         <div class="truncate overflow-hidden min-w-0 flex items-center space-x-2">
-          <span>{{ account.accountInfo.serverInfo.name }}</span>
+          <!-- <span>{{ account.accountInfo.serverInfo.name }}</span> -->
           <span class="text-foreground-2 truncate min-w-0 caption">
             {{ account.accountInfo.serverInfo.url.split('//')[1] }}
           </span>
