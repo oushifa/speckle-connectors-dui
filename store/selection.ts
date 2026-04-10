@@ -6,7 +6,7 @@ export const useSelectionStore = defineStore('selectionStore', () => {
   const hasBinding = ref(!!$selectionBinding)
 
   const selectionInfo = ref<SelectionInfo>({
-    summary: 'Nothing selected',
+    summary: '未选择任何对象',
     selectedObjectIds: [] as string[]
   })
 

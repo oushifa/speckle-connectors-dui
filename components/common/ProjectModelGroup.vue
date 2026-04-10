@@ -52,10 +52,7 @@
           }
         ]"
       >
-        <template #description>
-          The workspace is in a read-only locked state until there's an active
-          subscription. Subscribe to a plan to regain full access.
-        </template>
+        <template #description>项目已设置为只读状态，直到有活动订阅。</template>
       </CommonAlert>
       <ModelSender
         v-for="model in project.senders"
@@ -83,14 +80,14 @@
       @dismiss="askDismissProjectQuestionDialog = true"
     >
       <template #title>
-        Whoops - project
+        项目
         <code>{{ project.projectId }}</code>
-        is inaccessible.
+        不可访问。
       </template>
     </CommonAlert>
     <CommonDialog v-model:open="askDismissProjectQuestionDialog" fullscreen="none">
-      <template #header>Remove Project</template>
-      <div class="text-xs mb-4">Do you want to remove the project from this file?</div>
+      <template #header>删除项目</template>
+      <div class="text-xs mb-4">是否删除项目？</div>
       <div class="flex justify-between center py-2 space-x-3">
         <FormButton size="sm" full-width @click="removeProjectModels">Yes</FormButton>
         <FormButton
@@ -98,7 +95,7 @@
           full-width
           @click="askDismissProjectQuestionDialog = false"
         >
-          Hide error
+          关闭
         </FormButton>
       </div>
     </CommonDialog>

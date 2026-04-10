@@ -23,7 +23,7 @@
       </div>
       <button
         v-if="workspace.slug"
-        v-tippy="'Open workspace in browser'"
+        v-tippy="'在浏览器中打开'"
         class="hidden transition mr-1 opacity-70 group-hover:block"
         @click.stop="
           $openUrl(

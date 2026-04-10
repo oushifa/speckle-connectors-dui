@@ -45,7 +45,7 @@
         class="flex items-center w-0 group-hover:w-5 transition-[width]"
       >
         <FormButton
-          v-tippy="'Dismiss'"
+          v-tippy="'关闭'"
           color="subtle"
           size="sm"
           :icon-left="XMarkIcon"

@@ -9,7 +9,7 @@
 
     <!-- Step 1: Mapping Mode Selection -->
     <div class="px-2">
-      <p class="h5">Assign by</p>
+      <p class="h5">映射模式</p>
       <div class="space-y-2 my-2">
         <FormSelectBase
           :model-value="selectedMappingMode"
@@ -58,7 +58,7 @@
               v-model="revitMapperStore.selectedCategory"
               name="categoryMapping"
               :placeholder="dropdownPlaceholder"
-              label="Target Category"
+              label="目标分类"
               fixed-height
               size="sm"
               search
@@ -86,7 +86,7 @@
             :disabled="!revitMapperStore.selectedCategory?.value"
             @click="assignToCategory()"
           >
-            Apply
+            应用映射
           </FormButton>
         </div>
       </div>
@@ -100,7 +100,7 @@
       class="px-2"
     >
       <p class="h5">
-        {{ `Assigned Categories (${currentMappings.length > 0 ? 'Object' : 'Layer'})` }}
+        {{ `已映射分类 (${currentMappings.length > 0 ? '对象' : '层'})` }}
       </p>
 
       <!-- Object Mappings Section -->
@@ -144,10 +144,10 @@
           class="flex space-x-2"
         >
           <FormButton size="sm" color="outline" @click="selectAllMappedObjects()">
-            Select All
+            选择所有对象
           </FormButton>
           <FormButton size="sm" color="danger" @click="clearAllMappings()">
-            Clear All Objects
+            清除所有映射对象
           </FormButton>
         </div>
 
@@ -157,10 +157,10 @@
           class="flex space-x-2"
         >
           <FormButton size="sm" color="outline" @click="selectAllMappedLayers()">
-            Select All
+            选择所有层
           </FormButton>
           <FormButton size="sm" color="danger" @click="clearAllLayerMappings()">
-            Clear All Layers
+            清除所有映射层
           </FormButton>
         </div>
       </div>
@@ -168,7 +168,7 @@
       <!-- Mode Confirmation Dialog -->
       <CommonDialog
         v-model:open="showModeConfirmDialog"
-        title="Switch Category Assignment Mode"
+        title="切换分类映射模式"
         fullscreen="none"
       >
         <div class="text-sm text-foreground">
@@ -177,10 +177,10 @@
 
         <div class="mt-4 flex justify-end space-x-2">
           <FormButton size="sm" color="outline" @click="cancelModeChange()">
-            Cancel
+            取消
           </FormButton>
           <FormButton size="sm" color="danger" @click="confirmModeChange()">
-            Clear & Switch
+            清除并切换模式
           </FormButton>
         </div>
       </CommonDialog>

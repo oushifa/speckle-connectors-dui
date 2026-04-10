@@ -24,16 +24,12 @@
       </FormButton>
     </div>
 
-    <CommonDialog
-      v-model:open="openFilterDialog"
-      :title="`Change filter`"
-      fullscreen="none"
-    >
+    <CommonDialog v-model:open="openFilterDialog" :title="`过滤变更`" fullscreen="none">
       <FilterListSelect :filter="modelCard.sendFilter" @update:filter="updateFilter" />
 
       <div class="mt-4 flex justify-end items-center space-x-2">
         <FormButton size="sm" color="outline" @click.stop="saveFilter()">
-          Save
+          保存
         </FormButton>
         <div v-tippy="!canCreateVersionPerm ? canCreateVersionMessage : ''">
           <FormButton
@@ -41,7 +37,7 @@
             :disabled="!canCreateVersionPerm"
             @click.stop="saveFilterAndSend()"
           >
-            Save & Publish
+            保存并发布
           </FormButton>
         </div>
       </div>

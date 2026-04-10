@@ -4,7 +4,7 @@
     :disabled="(selectedVersionId === version.id && !fromWizard) || isLimited"
   >
     <UserAvatar
-      v-tippy="`Authored by ${version.authorUser?.name}`"
+      v-tippy="`${version.authorUser?.name} 编辑`"
       :user="{ avatar: version.authorUser?.avatar, name: version.authorUser?.name as string }"
       size="sm"
       class="absolute inset-1"

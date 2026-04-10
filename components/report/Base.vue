@@ -2,7 +2,7 @@
   <div>
     <slot name="activator" :toggle="toggleDialog">
       <FormButton
-        v-tippy="'View report'"
+        v-tippy="'查看报告详情'"
         color="outline"
         :icon-left="
           summary.failedCount === 0 && summary.warningCount === 0
@@ -14,13 +14,15 @@
         @click.stop="toggleDialog()"
       />
     </slot>
-    <CommonDialog v-model:open="showReportDialog" :title="`Report`" fullscreen="none">
+    <CommonDialog v-model:open="showReportDialog" :title="`报告`" fullscreen="none">
       <div class="text-body-2xs">
-        {{ numberOfSuccess }} objects converted ok, {{ numberOfWarning }} warnings and
-        {{ numberOfFailed }} errors.
+        {{ numberOfSuccess }} 个对象转换成功，{{ numberOfWarning }} 个对象转换警告，{{
+          numberOfFailed
+        }}
+        个对象转换失败。
       </div>
       <div class="flex mt-2 space-x-2 text-body-2xs">
-        <span>Filter:</span>
+        <span>筛选:</span>
         <button
           v-if="numberOfSuccess !== 0"
           class="flex items-center justify-center border-success px-1 pb-1 text-success leading-none"
@@ -63,12 +65,12 @@
           :report-item="item"
         />
         <div v-if="reportLimited.length === 0" class="text-body-xs text-foreground-2">
-          No items found.
+          未找到匹配项。
         </div>
       </div>
       <div v-if="report.length > reportSlice">
         <FormButton size="sm" full-width color="outline" @click="reportSlice += 20">
-          Show more
+          显示更多项
         </FormButton>
       </div>
     </CommonDialog>
@@ -135,18 +137,18 @@ const summary = computed(() => {
   const warning = props.report.filter((item) => item.status === 3)
   const ok = props.report.filter((item) => item.status === 1)
 
-  let hint = 'All objects converted ok'
+  let hint = '所有对象转换成功，无警告和错误。'
   const isSuccess = failed.length === 0 && warning.length === 0
   if (!isSuccess) {
     if (failed.length !== 0 && warning.length !== 0) {
       // both fail and warning
-      hint = `${failed.length} object(s) failed to convert, ${warning.length} object(s) converted with warning`
+      hint = `${failed.length} 个对象转换失败， ${warning.length} 个对象转换警告`
     } else if (failed.length !== 0 && warning.length === 0) {
       // only fail
-      hint = `${failed.length} object(s) failed to convert`
+      hint = `${failed.length} 个对象转换失败`
     } else if (warning.length !== 0 && failed.length === 0) {
       // only warning
-      hint = `${warning.length} object(s) converted with warning`
+      hint = `${warning.length} 个对象转换警告`
     }
   }
   return {

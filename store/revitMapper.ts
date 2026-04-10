@@ -22,7 +22,7 @@ export const useRevitMapper = defineStore('revitMapper', () => {
     }
 
     return {
-      label: 'Multiple categories',
+      label: '多个分类',
       value: 'multiple',
       isMultiple: true
     }

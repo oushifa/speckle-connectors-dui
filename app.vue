@@ -23,12 +23,9 @@ const hostAppStore = useHostAppStore()
 const { connectorVersion, hostAppName, hostAppVersion } = storeToRefs(hostAppStore)
 
 useHead({
-  title: computed(
-    () =>
-      `CNX: (hostApp: ${hostAppName.value}:v${hostAppVersion.value}),(version: ${connectorVersion.value})`
-  ),
+  title: computed(() => `数智南北`),
   htmlAttrs: {
-    lang: 'en',
+    lang: 'zh',
     class: computed(() => (isDarkTheme.value ? `dark` : ``))
   },
   bodyAttrs: {

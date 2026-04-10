@@ -7,8 +7,8 @@
       :search-placeholder="''"
       :filter-predicate="searchFilterPredicate"
       name="view"
-      label="View"
-      placeholder="Nothing selected"
+      label="视图"
+      placeholder="未选择"
       class="w-full"
       fixed-height
       show-label

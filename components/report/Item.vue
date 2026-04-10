@@ -29,7 +29,7 @@
         </span>
       </div>
       <button
-        v-tippy="'Details'"
+        v-tippy="'查看详情'"
         class="block rounded-lg transition hover:bg-primary-muted ml-auto"
         @click.stop="toggleDetails"
       >
@@ -42,7 +42,7 @@
       </button>
       <button
         v-if="reportItem.status !== 1 && !isSender"
-        v-tippy="'See object on Web'"
+        v-tippy="'查看详情'"
         class="block rounded-lg transition hover:bg-primary-muted ml-1"
         @click.stop="openObjectOnWeb"
       >
@@ -55,7 +55,7 @@
     class="text-xs text-foreground-2 ml-3 rounded-lg p-1 hover:bg-primary-muted hover:cursor-pointer"
   >
     <button
-      v-tippy="'Copy to clipboard'"
+      v-tippy="'复制到剪贴板'"
       class="text-left w-full whitespace-pre-wrap break-all overflow-hidden"
       @click="copyToClipboard(details)"
     >

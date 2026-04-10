@@ -5,7 +5,7 @@
     <div class="flex items-center space-x-2 justify-between">
       <FormTextInput
         v-model="searchValue"
-        placeholder="Search"
+        placeholder="搜索"
         name="search"
         autocomplete="off"
         :show-clear="!!searchValue"
@@ -13,7 +13,7 @@
         color="foundation"
       />
       <FormButton color="outline" size="sm" @click="selectAllCategories">
-        {{ allSelected ? 'Deselect all' : 'Select all' }}
+        {{ allSelected ? '取消全选' : '全选' }}
       </FormButton>
     </div>
     <div class="flex space-y-1 flex-col max-h-48 simple-scrollbar overflow-auto">
@@ -25,7 +25,7 @@
       >
         <!-- We were use to use FormButton for this but our lovely Revit 2022 (CEF 65) but it didn't work properly in terms of CSS. -->
         <div
-          v-tippy="'Remove'"
+          v-tippy="'取消选择'"
           :class="`block h-6 text-body-2xs px-2 py-1 rounded-md flex align-center justify-between w-full hover:cursor-pointer hover:shadow-md bg-primary text-foreground-on-primary border-outline-2 text-foreground font-medium p-1 border focus-visible:border-foundation`"
           @click="selectOrUnselectCategory(cat.id)"
         >
@@ -41,7 +41,7 @@
       <div
         v-for="cat in searchResults.sort((a, b) => a.name.localeCompare(b.name))"
         :key="cat.id"
-        v-tippy="'Add'"
+        v-tippy="'选择'"
         :class="`block h-6 text-body-2xs ${
           selectedCategories.includes(cat.id) ? 'bg-primary' : ''
         } px-2 py-1 rounded-md align-center justify-between w-full hover:cursor-pointer hover:shadow-md bg-foundation border-outline-2 text-foreground font-medium p-1 hover:bg-primary-muted border disabled:hover:bg-foundation focus-visible:border-foundation`"
@@ -51,9 +51,9 @@
         <!-- <PlusIcon class="w-4" /> -->
       </div>
       <div v-if="searchResults.length === 0" class="text-xs text-center">
-        Nothing found
+        未找到匹配项
         <FormButton color="outline" size="sm" @click="searchValue = undefined">
-          Clear search
+          清除搜索
         </FormButton>
       </div>
     </div>

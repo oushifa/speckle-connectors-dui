@@ -48,7 +48,7 @@ export function useUpdateConnector() {
     try {
       // End point to get list of versions that deployed by Speckle's pipeline
       const response = await fetch(
-        `https://releases.speckle.dev/manager2/feeds/${hostApp.hostAppName?.toLowerCase()}-v3.json`,
+        `https://47.104.104.104/manager2/feeds/${hostApp.hostAppName?.toLowerCase()}-v3.json`,
         {
           method: 'GET'
         }
