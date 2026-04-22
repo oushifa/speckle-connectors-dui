@@ -120,7 +120,7 @@ export default defineNuxtPlugin(async () => {
   const selectionBinding =
     isRunningOnConnector || !isDev
       ? await tryHoistBinding<ISelectionBinding>(ISelectionBindingKey)
-      : hoistMockBinding(new MockedSelectionBinding(), ISendBindingKey)
+      : hoistMockBinding(new MockedSelectionBinding(), ISelectionBindingKey)
 
   const revitMapperBinding =
     isRunningOnConnector || !isDev
