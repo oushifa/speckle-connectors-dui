@@ -114,6 +114,7 @@ import {
   projectUpdatedSubscription
 } from '~~/lib/graphql/mutationsAndQueries'
 import { useMixpanel } from '~/lib/core/composables/mixpanel'
+import { useCustomPermissions } from '~/lib/core/composables/customPermissions'
 
 const { trackEvent } = useMixpanel()
 const accountStore = useAccountStore()
@@ -132,6 +133,20 @@ const projectIsAccesible = ref<boolean | undefined>(undefined)
 const projectAccount = computed(() =>
   accountStore.accountWithFallback(props.project.accountId, props.project.serverUrl)
 )
+
+const { fetchPermissionsForAccount, hasFunctionalPerm } = useCustomPermissions()
+
+onMounted(async () => {
+  if (projectAccount.value?.accountInfo.id) {
+    await fetchPermissionsForAccount(projectAccount.value.accountInfo.id)
+  }
+})
+
+watch(() => projectAccount.value?.accountInfo.id, async (newId) => {
+  if (newId) {
+    await fetchPermissionsForAccount(newId)
+  }
+})
 
 const isPersonalProject = computed(() => !projectDetails.value?.workspace)
 const projectNavigatorTippy = computed(() =>
@@ -157,10 +172,21 @@ watch(projectDetails, (newValue) => {
   projectIsAccesible.value = newValue !== undefined
 })
 
-const canLoad = computed(() => !!projectDetails.value?.permissions.canLoad.authorized)
-const canPublish = computed(
-  () => !!projectDetails.value?.permissions.canPublish.authorized
-)
+const canLoad = computed(() => {
+  const base = !!projectDetails.value?.permissions.canLoad.authorized
+  if (!base) return false
+  const accId = projectAccount.value?.accountInfo.id
+  if (!accId) return true
+  return hasFunctionalPerm(accId, 'file-management:download')
+})
+
+const canPublish = computed(() => {
+  const base = !!projectDetails.value?.permissions.canPublish.authorized
+  if (!base) return false
+  const accId = projectAccount.value?.accountInfo.id
+  if (!accId) return true
+  return hasFunctionalPerm(accId, 'file-management:publish')
+})
 
 const isWorkspaceReadOnly = computed(() => {
   if (!projectDetails.value?.workspace) return false // project is not even in a workspace

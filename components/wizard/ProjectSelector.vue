@@ -222,6 +222,7 @@ import type {
 import { useMixpanel } from '~/lib/core/composables/mixpanel'
 import { useConfigStore } from '~/store/config'
 import { useHostAppStore } from '~/store/hostApp'
+import { useCustomPermissions } from '~/lib/core/composables/customPermissions'
 import getConfig from '~/env-config'
 
 const hostAppStore = useHostAppStore()
@@ -261,6 +262,14 @@ const configStore = useConfigStore()
 const { activeAccount } = storeToRefs(accountStore)
 
 const accountId = computed(() => activeAccount.value.accountInfo.id)
+
+const { fetchPermissionsForAccount, hasFunctionalPerm } = useCustomPermissions()
+
+watch(accountId, async (newId) => {
+  if (newId) {
+    await fetchPermissionsForAccount(newId)
+  }
+}, { immediate: true })
 
 watch(searchText, () => {
   newProjectName.value = searchText.value
@@ -364,11 +373,15 @@ watch(
 )
 
 const handleProjectCardClick = (project: ProjectListProjectItemFragment) => {
-  if (
-    props.isSender
-      ? project.permissions.canPublish.authorized
-      : project.permissions.canLoad.authorized
-  ) {
+  const baseAccess = props.isSender
+    ? project.permissions.canPublish.authorized
+    : project.permissions.canLoad.authorized
+
+  const customAccess = props.isSender
+    ? hasFunctionalPerm(accountId.value, 'file-management:publish')
+    : hasFunctionalPerm(accountId.value, 'file-management:download')
+
+  if (baseAccess && customAccess) {
     emit('next', accountId.value, project, selectedWorkspace.value)
   }
 }
@@ -468,6 +481,10 @@ const { result: canCreatePersonalProjectResult } = useQuery(
 )
 
 const canCreateProject = computed(() => {
+  // Check custom permission first
+  if (accountId.value && !hasFunctionalPerm(accountId.value, 'file-management:create')) {
+    return false
+  }
   // If a workspace is selected, return that permission check
   if (selectedWorkspace.value && selectedWorkspace.value.permissions) {
     return selectedWorkspace.value.permissions.canCreateProject.authorized //as boolean
@@ -482,6 +499,13 @@ const canCreateProject = computed(() => {
 })
 
 const canCreateProjectPermissionCheck = computed(() => {
+  if (accountId.value && !hasFunctionalPerm(accountId.value, 'file-management:create')) {
+    return {
+      authorized: false,
+      code: 'CustomPermissionDenied',
+      message: '您的角色没有创建项目的权限。'
+    }
+  }
   if (selectedWorkspace.value && selectedWorkspace.value.permissions) {
     return selectedWorkspace.value.permissions.canCreateProject
   }

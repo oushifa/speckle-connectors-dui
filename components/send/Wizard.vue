@@ -77,6 +77,7 @@ import { useSettingsTracking } from '~/lib/core/composables/trackSettings'
 import type { CardSetting } from '~/lib/models/card/setting'
 import { useAddByUrl } from '~/lib/core/composables/addByUrl'
 import { useCheckGraphql } from '~/lib/core/composables/useCheckGraphql'
+import { useCustomPermissions } from '~/lib/core/composables/customPermissions'
 import { workspacePlanUsageUpdatedSubscription } from '~/lib/workspaces/graphql/subscriptions'
 
 const { trackEvent } = useMixpanel()
@@ -145,6 +146,17 @@ const checkPermissions = async () => {
       )
       canPublish.value = legacyRes.authorized
       publishLimitMessage.value = legacyRes.message || undefined
+    }
+
+    // Check custom permissions
+    if (canPublish.value) {
+      const { fetchPermissionsForAccount, hasFunctionalPerm } = useCustomPermissions()
+      await fetchPermissionsForAccount(selectedAccountId.value)
+      const hasCustomPublish = hasFunctionalPerm(selectedAccountId.value, 'file-management:publish')
+      if (!hasCustomPublish) {
+        canPublish.value = false
+        publishLimitMessage.value = '您的角色在该项目下没有发布模型的权限。'
+      }
     }
   } finally {
     isLoadingPermissions.value = false

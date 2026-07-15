@@ -22,6 +22,9 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import type { ProjectListProjectItemFragment } from '~/lib/common/generated/gql/graphql'
+import { useAccountStore } from '~/store/accounts'
+import { useCustomPermissions } from '~/lib/core/composables/customPermissions'
+
 const props = defineProps<{
   project: ProjectListProjectItemFragment
   isSender: boolean
@@ -34,17 +37,48 @@ const updatedAgo = computed(() => {
 const cardTippy = computed(() => (!hasAccess.value ? disabledMessage.value : ''))
 
 // Previously we were having hard coded messaging, web team will provide better messaging per permission here instaed common message
-const disabledMessage = computed(() =>
-  props.isSender
-    ? props.project.permissions.canPublish.message
-    : props.project.permissions.canLoad.message
-)
+const disabledMessage = computed(() => {
+  const accountStore = useAccountStore()
+  const accountId = accountStore.activeAccount.accountInfo.id
+  const { hasFunctionalPerm } = useCustomPermissions()
 
-const hasAccess = computed(() =>
-  props.isSender
+  const baseAccess = props.isSender
     ? props.project.permissions.canPublish.authorized
     : props.project.permissions.canLoad.authorized
-)
+
+  if (!baseAccess) {
+    return props.isSender
+      ? props.project.permissions.canPublish.message
+      : props.project.permissions.canLoad.message
+  }
+
+  const customAccess = props.isSender
+    ? hasFunctionalPerm(accountId, 'file-management:publish')
+    : hasFunctionalPerm(accountId, 'file-management:download')
+
+  if (!customAccess) {
+    return props.isSender
+      ? '您的角色在该项目下没有发布模型的权限。'
+      : '您的角色在该项目下没有加载模型的权限。'
+  }
+  return ''
+})
+
+const hasAccess = computed(() => {
+  const accountStore = useAccountStore()
+  const accountId = accountStore.activeAccount.accountInfo.id
+  const { hasFunctionalPerm } = useCustomPermissions()
+
+  const baseAccess = props.isSender
+    ? props.project.permissions.canPublish.authorized
+    : props.project.permissions.canLoad.authorized
+
+  if (!baseAccess) return false
+
+  return props.isSender
+    ? hasFunctionalPerm(accountId, 'file-management:publish')
+    : hasFunctionalPerm(accountId, 'file-management:download')
+})
 
 const projectRole = computed(() => {
   if (hasAccess.value) {

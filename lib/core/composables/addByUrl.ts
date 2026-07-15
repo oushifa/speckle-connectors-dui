@@ -12,6 +12,7 @@ import {
 } from '~/lib/graphql/mutationsAndQueries'
 import { omit } from 'lodash-es'
 import { useDebounceFn } from '@vueuse/core'
+import { useCustomPermissions } from '~/lib/core/composables/customPermissions'
 
 export function useAddByUrl() {
   const accountStore = useAccountStore()
@@ -115,8 +116,21 @@ export function useAddByUrl() {
           ? project.permissions.canPublish.authorized
           : project.permissions.canLoad.authorized
 
-      if (!hasAccess && userInfoRes.data.activeUser?.role !== 'server:admin') {
-        urlParseError.value = errorMessage
+      // Check custom permissions
+      const { fetchPermissionsForAccount, hasFunctionalPerm } = useCustomPermissions()
+      await fetchPermissionsForAccount(acc.accountInfo.id)
+
+      const customAccess =
+        type === 'sender'
+          ? hasFunctionalPerm(acc.accountInfo.id, 'file-management:publish')
+          : hasFunctionalPerm(acc.accountInfo.id, 'file-management:download')
+
+      if ((!hasAccess || !customAccess) && userInfoRes.data.activeUser?.role !== 'server:admin') {
+        urlParseError.value = !hasAccess
+          ? errorMessage
+          : (type === 'sender'
+              ? '您的角色在该项目下没有发布模型的权限。'
+              : '您的角色在该项目下没有加载模型的权限。')
         return
       }
 
