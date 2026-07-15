@@ -1,6 +1,8 @@
 import type { CodegenConfig } from '@graphql-codegen/cli'
-
+import dotenv from 'dotenv'
 import getConfig from './env-config'
+
+dotenv.config()
 
 const config: CodegenConfig = {
   schema: getConfig('serverUrl') + '/graphql',
