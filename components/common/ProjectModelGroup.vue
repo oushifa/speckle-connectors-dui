@@ -173,19 +173,25 @@ watch(projectDetails, (newValue) => {
 })
 
 const canLoad = computed(() => {
-  const base = !!projectDetails.value?.permissions.canLoad.authorized
-  if (!base) return false
   const accId = projectAccount.value?.accountInfo.id
-  if (!accId) return true
-  return hasFunctionalPerm(accId, 'file-management:download')
+  if (accId) {
+    const { permissions } = useCustomPermissions()
+    if (permissions(accId)) {
+      return hasFunctionalPerm(accId, 'file-management:download')
+    }
+  }
+  return !!projectDetails.value?.permissions.canLoad.authorized
 })
 
 const canPublish = computed(() => {
-  const base = !!projectDetails.value?.permissions.canPublish.authorized
-  if (!base) return false
   const accId = projectAccount.value?.accountInfo.id
-  if (!accId) return true
-  return hasFunctionalPerm(accId, 'file-management:publish')
+  if (accId) {
+    const { permissions } = useCustomPermissions()
+    if (permissions(accId)) {
+      return hasFunctionalPerm(accId, 'file-management:publish')
+    }
+  }
+  return !!projectDetails.value?.permissions.canPublish.authorized
 })
 
 const isWorkspaceReadOnly = computed(() => {

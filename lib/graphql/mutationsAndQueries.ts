@@ -493,10 +493,15 @@ export const modelDetailsQuery = graphql(`
         id
         displayName
         name
-        versions {
+        versions(limit: 1) {
           totalCount
           items {
             id
+            createdAt
+            authorUser {
+              id
+              name
+            }
           }
         }
         author {

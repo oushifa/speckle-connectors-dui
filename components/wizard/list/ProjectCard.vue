@@ -36,21 +36,11 @@ const updatedAgo = computed(() => {
 
 const cardTippy = computed(() => (!hasAccess.value ? disabledMessage.value : ''))
 
-// Previously we were having hard coded messaging, web team will provide better messaging per permission here instaed common message
 const disabledMessage = computed(() => {
   const accountStore = useAccountStore()
   const accountId = accountStore.activeAccount.accountInfo.id
-  const { hasFunctionalPerm } = useCustomPermissions()
-
-  const baseAccess = props.isSender
-    ? props.project.permissions.canPublish.authorized
-    : props.project.permissions.canLoad.authorized
-
-  if (!baseAccess) {
-    return props.isSender
-      ? props.project.permissions.canPublish.message
-      : props.project.permissions.canLoad.message
-  }
+  const { hasFunctionalPerm, permissions } = useCustomPermissions()
+  const customPermState = permissions(accountId)
 
   const customAccess = props.isSender
     ? hasFunctionalPerm(accountId, 'file-management:publish')
@@ -61,23 +51,40 @@ const disabledMessage = computed(() => {
       ? '您的角色在该项目下没有发布模型的权限。'
       : '您的角色在该项目下没有加载模型的权限。'
   }
+
+  if (!customPermState) {
+    const baseAccess = props.isSender
+      ? props.project.permissions.canPublish.authorized
+      : props.project.permissions.canLoad.authorized
+    if (!baseAccess) {
+      return props.isSender
+        ? props.project.permissions.canPublish.message
+        : props.project.permissions.canLoad.message
+    }
+  }
+
   return ''
 })
 
 const hasAccess = computed(() => {
   const accountStore = useAccountStore()
   const accountId = accountStore.activeAccount.accountInfo.id
-  const { hasFunctionalPerm } = useCustomPermissions()
+  const { hasFunctionalPerm, permissions } = useCustomPermissions()
+  const customPermState = permissions(accountId)
+
+  const customAccess = props.isSender
+    ? hasFunctionalPerm(accountId, 'file-management:publish')
+    : hasFunctionalPerm(accountId, 'file-management:download')
+
+  if (customPermState) {
+    return customAccess
+  }
 
   const baseAccess = props.isSender
     ? props.project.permissions.canPublish.authorized
     : props.project.permissions.canLoad.authorized
 
-  if (!baseAccess) return false
-
-  return props.isSender
-    ? hasFunctionalPerm(accountId, 'file-management:publish')
-    : hasFunctionalPerm(accountId, 'file-management:download')
+  return baseAccess && customAccess
 })
 
 const projectRole = computed(() => {

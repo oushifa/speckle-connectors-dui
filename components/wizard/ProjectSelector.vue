@@ -373,13 +373,23 @@ watch(
 )
 
 const handleProjectCardClick = (project: ProjectListProjectItemFragment) => {
-  const baseAccess = props.isSender
-    ? project.permissions.canPublish.authorized
-    : project.permissions.canLoad.authorized
+  const { permissions } = useCustomPermissions()
+  const customPermState = permissions(accountId.value)
 
   const customAccess = props.isSender
     ? hasFunctionalPerm(accountId.value, 'file-management:publish')
     : hasFunctionalPerm(accountId.value, 'file-management:download')
+
+  if (customPermState) {
+    if (customAccess) {
+      emit('next', accountId.value, project, selectedWorkspace.value)
+    }
+    return
+  }
+
+  const baseAccess = props.isSender
+    ? project.permissions.canPublish.authorized
+    : project.permissions.canLoad.authorized
 
   if (baseAccess && customAccess) {
     emit('next', accountId.value, project, selectedWorkspace.value)
@@ -481,9 +491,13 @@ const { result: canCreatePersonalProjectResult } = useQuery(
 )
 
 const canCreateProject = computed(() => {
-  // Check custom permission first
-  if (accountId.value && !hasFunctionalPerm(accountId.value, 'file-management:create')) {
+  // Check custom permission first (企业级 - 项目管理 - 新建)
+  if (accountId.value && !hasFunctionalPerm(accountId.value, 'ent-projects:create')) {
     return false
+  }
+  const { permissions } = useCustomPermissions()
+  if (permissions(accountId.value)) {
+    return true
   }
   // If a workspace is selected, return that permission check
   if (selectedWorkspace.value && selectedWorkspace.value.permissions) {
@@ -499,11 +513,19 @@ const canCreateProject = computed(() => {
 })
 
 const canCreateProjectPermissionCheck = computed(() => {
-  if (accountId.value && !hasFunctionalPerm(accountId.value, 'file-management:create')) {
+  if (accountId.value && !hasFunctionalPerm(accountId.value, 'ent-projects:create')) {
     return {
       authorized: false,
       code: 'CustomPermissionDenied',
-      message: '您的角色没有创建项目的权限。'
+      message: '您的角色没有在企业级新建项目的权限。'
+    }
+  }
+  const { permissions } = useCustomPermissions()
+  if (permissions(accountId.value)) {
+    return {
+      authorized: true,
+      code: 'Authorized',
+      message: null
     }
   }
   if (selectedWorkspace.value && selectedWorkspace.value.permissions) {

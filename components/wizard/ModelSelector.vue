@@ -15,16 +15,14 @@
         />
         <div
           v-tippy="
-            canCreateModelResult?.project.permissions.canCreateModel.authorized
+            canCreateModel
               ? '创建新模型'
-              : canCreateModelResult?.project.permissions.canCreateModel.message
+              : canCreateModelMessage
           "
         >
           <FormButton
             color="outline"
-            :disabled="
-              !canCreateModelResult?.project.permissions.canCreateModel.authorized
-            "
+            :disabled="!canCreateModel"
             :class="`p-1.5 bg-foundation hover:bg-primary-muted rounded text-foreground border`"
             @click="showNewModelDialog = true"
           >
@@ -32,15 +30,10 @@
           </FormButton>
         </div>
       </div>
-      <div
-        v-if="
-          canCreateModelResult &&
-          !canCreateModelResult.project.permissions.canCreateModel.authorized
-        "
-      >
+      <div v-if="!canCreateModel && canCreateModelMessage">
         <CommonAlert title="无法创建新模型" color="info" hide-icon>
           <template #description>
-            {{ canCreateModelResult.project.permissions.canCreateModel.message }}
+            {{ canCreateModelMessage }}
 
             <FormButton
               v-if="workspaceSlug"
@@ -176,6 +169,7 @@ import type { DUIAccount } from '~/store/accounts'
 import { useAccountStore } from '~/store/accounts'
 import { useHostAppStore } from '~/store/hostApp'
 import { useMixpanel } from '~/lib/core/composables/mixpanel'
+import { useCustomPermissions } from '~/lib/core/composables/customPermissions'
 
 const { trackEvent } = useMixpanel()
 const hostAppStore = useHostAppStore()
@@ -197,6 +191,22 @@ const props = withDefaults(
 )
 
 const accountStore = useAccountStore()
+const { fetchPermissionsForAccount, hasFunctionalPerm, permissions } = useCustomPermissions()
+
+onMounted(async () => {
+  if (props.accountId) {
+    await fetchPermissionsForAccount(props.accountId)
+  }
+})
+
+watch(
+  () => props.accountId,
+  async (newId) => {
+    if (newId) {
+      await fetchPermissionsForAccount(newId)
+    }
+  }
+)
 
 const account = computed(
   () =>
@@ -248,13 +258,44 @@ const handleModelCreated = (result: ModelListModelItemFragment) => {
 
 const isCreatingModel = ref(false)
 
+const { result: canCreateModelResult } = useQuery(
+  canCreateModelInProjectQuery,
+  () => ({ projectId: props.project.id }),
+  () => ({
+    clientId: props.accountId,
+    fetchPolicy: 'network-only'
+  })
+)
+
+const canCreateModelPermissionCheck = computed(() => {
+  if (props.accountId && !hasFunctionalPerm(props.accountId, 'file-management:create')) {
+    return {
+      authorized: false,
+      message: '您的角色在该项目下没有创建模型的权限。'
+    }
+  }
+  const customPermState = permissions(props.accountId)
+  if (customPermState) {
+    return {
+      authorized: true,
+      message: null
+    }
+  }
+  if (canCreateModelResult.value) {
+    return canCreateModelResult.value.project.permissions.canCreateModel
+  }
+  return { authorized: true, message: null }
+})
+
+const canCreateModel = computed(() => canCreateModelPermissionCheck.value.authorized)
+const canCreateModelMessage = computed(() => canCreateModelPermissionCheck.value.message)
+
 const createNewModel = async (name: string) => {
-  if (!canCreateModelResult.value?.project.permissions.canCreateModel.authorized) {
+  if (!canCreateModel.value) {
     hostAppStore.setNotification({
       type: 1,
       title: '创建模型失败',
-      description:
-        canCreateModelResult.value?.project.permissions.canCreateModel.message
+      description: canCreateModelMessage.value || '您没有创建模型的权限。'
     })
     return
   }
@@ -285,15 +326,6 @@ const createNewModel = async (name: string) => {
   }
   isCreatingModel.value = false
 }
-
-const { result: canCreateModelResult } = useQuery(
-  canCreateModelInProjectQuery,
-  () => ({ projectId: props.project.id }),
-  () => ({
-    clientId: props.accountId,
-    fetchPolicy: 'network-only'
-  })
-)
 
 const {
   result: projectModelsResult,

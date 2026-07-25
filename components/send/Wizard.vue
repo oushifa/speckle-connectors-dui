@@ -129,6 +129,41 @@ const checkPermissions = async () => {
   isLoadingPermissions.value = true
 
   try {
+    const { fetchPermissionsForAccount, hasFunctionalPerm, permissions } = useCustomPermissions()
+    await fetchPermissionsForAccount(selectedAccountId.value)
+    const customPermState = permissions(selectedAccountId.value)
+
+    if (customPermState) {
+      // 1. 检查基础发布权限 file-management:publish
+      const hasPublishPerm = hasFunctionalPerm(selectedAccountId.value, 'file-management:publish')
+      if (!hasPublishPerm) {
+        canPublish.value = false
+        publishLimitMessage.value = '您的角色在该项目下没有发布模型的权限。'
+        return
+      }
+
+      // 2. 检查跨用户提交新版本（编辑权限 file-management:edit）
+      const latestVersion = selectedModel.value?.versions?.items?.[0]
+      if (latestVersion && latestVersion.authorUser) {
+        const currentUserId = activeAccount.value?.accountInfo.user?.id || activeAccount.value?.accountInfo.id
+        const authorId = latestVersion.authorUser.id
+
+        if (authorId && authorId !== currentUserId) {
+          const hasEditPerm = hasFunctionalPerm(selectedAccountId.value, 'file-management:edit')
+          if (!hasEditPerm) {
+            canPublish.value = false
+            const authorName = latestVersion.authorUser.name || '其他用户'
+            publishLimitMessage.value = `该模型的最新版本由 ${authorName} 发布，您没有编辑权限，无法在他人最新版本的基础上提交新版本。`
+            return
+          }
+        }
+      }
+
+      canPublish.value = true
+      publishLimitMessage.value = undefined
+      return
+    }
+
     const res = await canCreateModelIngestion(
       selectedProject.value.id,
       selectedModel.value.id,
@@ -146,17 +181,6 @@ const checkPermissions = async () => {
       )
       canPublish.value = legacyRes.authorized
       publishLimitMessage.value = legacyRes.message || undefined
-    }
-
-    // Check custom permissions
-    if (canPublish.value) {
-      const { fetchPermissionsForAccount, hasFunctionalPerm } = useCustomPermissions()
-      await fetchPermissionsForAccount(selectedAccountId.value)
-      const hasCustomPublish = hasFunctionalPerm(selectedAccountId.value, 'file-management:publish')
-      if (!hasCustomPublish) {
-        canPublish.value = false
-        publishLimitMessage.value = '您的角色在该项目下没有发布模型的权限。'
-      }
     }
   } finally {
     isLoadingPermissions.value = false

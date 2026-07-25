@@ -106,31 +106,30 @@ export function useAddByUrl() {
     }
 
     if (project && model && acc) {
-      const errorMessage =
-        type === 'sender'
-          ? project.permissions.canPublish.message
-          : project.permissions.canLoad.message
-
-      const hasAccess =
-        type === 'sender'
-          ? project.permissions.canPublish.authorized
-          : project.permissions.canLoad.authorized
-
       // Check custom permissions
-      const { fetchPermissionsForAccount, hasFunctionalPerm } = useCustomPermissions()
+      const { fetchPermissionsForAccount, hasFunctionalPerm, permissions } = useCustomPermissions()
       await fetchPermissionsForAccount(acc.accountInfo.id)
+      const customPermState = permissions(acc.accountInfo.id)
 
       const customAccess =
         type === 'sender'
           ? hasFunctionalPerm(acc.accountInfo.id, 'file-management:publish')
           : hasFunctionalPerm(acc.accountInfo.id, 'file-management:download')
 
-      if ((!hasAccess || !customAccess) && userInfoRes.data.activeUser?.role !== 'server:admin') {
-        urlParseError.value = !hasAccess
-          ? errorMessage
-          : (type === 'sender'
-              ? '您的角色在该项目下没有发布模型的权限。'
-              : '您的角色在该项目下没有加载模型的权限。')
+      const hasAccess =
+        type === 'sender'
+          ? project.permissions.canPublish.authorized
+          : project.permissions.canLoad.authorized
+
+      const isAuthorized = customPermState
+        ? customAccess
+        : (hasAccess && customAccess)
+
+      if (!isAuthorized && userInfoRes.data.activeUser?.role !== 'server:admin') {
+        urlParseError.value =
+          type === 'sender'
+            ? '您的角色在该项目下没有发布模型的权限。'
+            : '您的角色在该项目下没有加载模型的权限。'
         return
       }
 

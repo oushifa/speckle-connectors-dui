@@ -153,10 +153,47 @@ app.$baseBinding?.on('documentChanged', () => {
   openFilterDialog.value = false
 })
 
+const { fetchPermissionsForAccount, hasFunctionalPerm, permissions } = useCustomPermissions()
+
 const canCreateVersionPerm = ref(true)
 const canCreateVersionMessage = ref<string | null>(null)
 
 const checkPermissions = async () => {
+  await fetchPermissionsForAccount(props.modelCard.accountId)
+  const customPermState = permissions(props.modelCard.accountId)
+
+  if (customPermState) {
+    // 1. 检查基础发布权限 file-management:publish
+    const hasPublish = hasFunctionalPerm(props.modelCard.accountId, 'file-management:publish')
+    if (!hasPublish) {
+      canCreateVersionPerm.value = false
+      canCreateVersionMessage.value = '您的角色在该项目下没有发布模型的权限。'
+      return
+    }
+
+    // 2. 检查跨用户提交新版本（编辑权限 file-management:edit）
+    const modelData = cardBase.value?.modelData
+    const latestVersion = modelData?.versions?.items?.[0]
+    if (latestVersion && latestVersion.authorUser) {
+      const currentUserId = account.accountInfo.user?.id || account.accountInfo.id
+      const authorId = latestVersion.authorUser.id
+
+      if (authorId && authorId !== currentUserId) {
+        const hasEdit = hasFunctionalPerm(props.modelCard.accountId, 'file-management:edit')
+        if (!hasEdit) {
+          canCreateVersionPerm.value = false
+          const authorName = latestVersion.authorUser.name || '其他用户'
+          canCreateVersionMessage.value = `该模型的最新版本由 ${authorName} 发布，您没有编辑权限，无法在他人最新版本的基础上提交新版本。`
+          return
+        }
+      }
+    }
+
+    canCreateVersionPerm.value = true
+    canCreateVersionMessage.value = null
+    return
+  }
+
   const res = await canCreateModelIngestion(
     props.modelCard.projectId,
     props.modelCard.modelId,
@@ -208,6 +245,17 @@ const updateFilter = (filter: ISendFilter) => {
 }
 
 const saveFilter = async () => {
+  const hasEdit = hasFunctionalPerm(props.modelCard.accountId, 'file-management:edit')
+  if (!hasEdit) {
+    store.setNotification({
+      type: ToastNotificationType.Danger,
+      title: '操作受限',
+      description: '您的角色在该项目下没有修改过滤设置的权限。',
+      autoClose: true
+    })
+    return
+  }
+
   void trackEvent('DUI3 Action', {
     name: 'Publish Card Filter Change',
     filter: newFilter.typeDiscriminator
@@ -233,6 +281,18 @@ const setVersionMessage = async (message: string) => {
     return
   }
 
+  const hasEdit = hasFunctionalPerm(props.modelCard.accountId, 'file-management:edit')
+  if (!hasEdit) {
+    store.setNotification({
+      type: ToastNotificationType.Danger,
+      title: '操作受限',
+      description: '您的角色在该项目下没有编辑版本描述的权限。',
+      autoClose: true
+    })
+    showSetMessageDialog.value = false
+    return
+  }
+
   void trackEvent('DUI3 Action', {
     name: 'Set version message'
   })
@@ -251,13 +311,6 @@ const setVersionMessage = async (message: string) => {
   })
 
   if (res?.data?.versionMutations.update.id) {
-    // seemed to noisy, and autoclose does not work for some reason.
-    // nicer ux to just close the dialog
-    // store.setNotification({
-    //   type: ToastNotificationType.Info,
-    //   title: 'Version message saved',
-    //   autoClose: true
-    // })
     hasSetVersionMessage.value = true
   } else {
     store.setNotification({
@@ -272,6 +325,15 @@ const setVersionMessage = async (message: string) => {
 }
 
 const saveFilterAndSend = async () => {
+  if (!canCreateVersionPerm.value) {
+    store.setNotification({
+      type: ToastNotificationType.Danger,
+      title: '发布受限',
+      description: canCreateVersionMessage.value || '您没有发布版本的权限。',
+      autoClose: true
+    })
+    return
+  }
   await saveFilter()
   store.sendModel(props.modelCard.modelCardId, 'Filter')
   hasSetVersionMessage.value = false
