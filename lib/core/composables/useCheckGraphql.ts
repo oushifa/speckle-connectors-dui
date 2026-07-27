@@ -25,8 +25,12 @@ export function useCheckGraphql() {
         },
         fetchPolicy: 'network-only'
       })
+      const ingestion = result?.data?.project?.model?.permissions?.canCreateIngestion
+      if (!ingestion || result?.errors?.length) {
+        return { queryAvailable: false, authorized: false, message: undefined }
+      }
       return {
-        ...result.data.project.model.permissions.canCreateIngestion,
+        ...ingestion,
         queryAvailable: true
       }
     } catch {
