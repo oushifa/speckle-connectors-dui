@@ -145,7 +145,7 @@ const checkPermissions = async () => {
       // 2. 检查跨用户提交新版本（编辑权限 file-management:edit）
       const latestVersion = selectedModel.value?.versions?.items?.[0]
       if (latestVersion && latestVersion.authorUser) {
-        const currentUserId = activeAccount.value?.accountInfo.user?.id || activeAccount.value?.accountInfo.id
+        const currentUserId = activeAccount.value?.accountInfo.id
         const authorId = latestVersion.authorUser.id
 
         if (authorId && authorId !== currentUserId) {

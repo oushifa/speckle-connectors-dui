@@ -17,6 +17,9 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxt/image'
   ],
+  imports: {
+    dirs: ['lib/core/composables', 'lib/core/composables/**']
+  },
   alias: {
     // Rewriting all lodash calls to lodash-es for proper tree-shaking & chunk splitting
     // lodash: 'lodash-es'
