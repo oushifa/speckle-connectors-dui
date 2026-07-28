@@ -128,6 +128,7 @@ import { useAccountStore, type DUIAccount } from '~/store/accounts'
 import { setVersionMessageMutation } from '~/lib/graphql/mutationsAndQueries'
 import { workspacePlanUsageUpdatedSubscription } from '~/lib/workspaces/graphql/subscriptions'
 import { useCheckGraphql } from '~/lib/core/composables/useCheckGraphql'
+import { useCustomPermissions } from '~/lib/core/composables/customPermissions'
 
 const store = useHostAppStore()
 const accountStore = useAccountStore()
@@ -144,7 +145,7 @@ const props = defineProps<{
 }>()
 
 const account = accountStore.accounts.find(
-  (acc) => acc.accountInfo.id === props.project.accountId
+  (acc) => acc.accountInfo.id === props.modelCard.accountId
 ) as DUIAccount
 const clientId = account.accountInfo.id
 
@@ -175,7 +176,7 @@ const checkPermissions = async () => {
     const modelData = cardBase.value?.modelData
     const latestVersion = modelData?.versions?.items?.[0]
     if (latestVersion && latestVersion.authorUser) {
-      const currentUserId = account.accountInfo.user?.id || account.accountInfo.id
+      const currentUserId = account.accountInfo.id
       const authorId = latestVersion.authorUser.id
 
       if (authorId && authorId !== currentUserId) {
