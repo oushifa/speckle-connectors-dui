@@ -91,3 +91,8 @@ export function useCustomPermissions() {
     permissions: (accountId: string) => permissionsCache.value[accountId]
   }
 }
+
+if (typeof window !== 'undefined') {
+  ;(window as any).useCustomPermissions = useCustomPermissions
+}
+
