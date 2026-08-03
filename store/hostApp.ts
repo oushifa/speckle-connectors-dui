@@ -396,6 +396,12 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     console.log('[Publish Debug] Found target model card:', model)
     console.log('[Publish Debug] shouldHandleIngestion:', shouldHandleIngestion.value, 'hostAppName:', hostAppName.value)
 
+    model.latestCreatedVersionId = undefined
+    model.error = undefined
+    model.progress = { status: '正在检查发布权限...' }
+    model.expired = false
+    model.report = undefined
+
     try {
       const { canCreateModelIngestion, canCreateVersion } = useCheckGraphql()
       console.log('[Publish Debug] Checking canCreateModelIngestion...')
@@ -419,6 +425,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
           model.progress = { status: '正在转换对象...' }
         } else {
           console.warn('[Publish Debug] Ingestion not authorized:', canCreateIngestion.message)
+          model.progress = undefined
           setNotification({
             type: ToastNotificationType.Warning,
             title: '无法发布',
@@ -438,6 +445,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
         console.log('[Publish Debug] canCreateVersion result:', canCreate)
         if (!canCreate.authorized) {
           console.warn('[Publish Debug] Version creation not authorized:', canCreate.message)
+          model.progress = undefined
           setNotification({
             type: ToastNotificationType.Warning,
             title: '无法发布',
@@ -448,11 +456,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
         }
       }
 
-      model.latestCreatedVersionId = undefined
-      model.error = undefined
-      model.progress = { status: '开始发送...' }
-      model.expired = false
-      model.report = undefined
+      model.progress = { status: '开始发送，等待宿主响应...' }
 
       console.log('[Publish Debug] Invoking app.$sendBinding.send for modelCardId:', modelCardId)
       // You should stop asking why if you saw anything related autocad..

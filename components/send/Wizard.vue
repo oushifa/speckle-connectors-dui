@@ -276,10 +276,21 @@ const addModel = async () => {
     }
 
     if (existingModel) {
-      console.log('[Publish Debug] Existing model card found:', existingModel.modelCardId)
+      console.log(
+        '[Publish Debug] Existing model card found:',
+        existingModel.modelCardId,
+        'Updating accountId from',
+        existingModel.accountId,
+        'to',
+        selectedAccountId.value
+      )
       emit('close')
-      // Patch the existing model card with new send filter and non-expired state!
+      // Patch the existing model card with new account, send filter and non-expired state!
       await hostAppStore.patchModel(existingModel.modelCardId, {
+        accountId: selectedAccountId.value,
+        serverUrl: activeAccount.value?.accountInfo.serverInfo.url as string,
+        workspaceId: selectedProject.value?.workspace?.id as string,
+        workspaceSlug: selectedProject?.value?.workspace?.slug as string,
         sendFilter: filter.value as ISendFilter,
         expired: false
       })
