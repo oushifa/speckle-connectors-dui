@@ -48,8 +48,9 @@ export class MockedSendBinding implements ISendBinding {
     return await []
   }
 
-  public async send(_modelCardId: string) {
-    return await console.log('no way dude')
+  public async send(modelCardId: string) {
+    console.log('[Publish Debug] MockedSendBinding.send called for modelCardId:', modelCardId, '(Running on Web Mock mode)')
+    return Promise.resolve()
   }
 
   public async cancelSend(_modelCardId: string) {

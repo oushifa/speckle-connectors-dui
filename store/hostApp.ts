@@ -459,16 +459,33 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
       model.progress = { status: '开始发送，等待宿主响应...' }
 
       console.log('[Publish Debug] Invoking app.$sendBinding.send for modelCardId:', modelCardId)
-      // You should stop asking why if you saw anything related autocad..
-      // It solves the press "escape" issue.
-      // Because probably we don't give enough time to acad complete it's previos task and it stucks.
+      const handleSendPromise = (promise: Promise<unknown>) => {
+        promise
+          .then((res) => {
+            console.log('[Publish Debug] app.$sendBinding.send resolved successfully with:', res)
+          })
+          .catch((err) => {
+            console.error('[Publish Debug] app.$sendBinding.send Promise REJECTED:', err)
+            model.progress = undefined
+            model.error = {
+              errorMessage: `宿主应用程序发送失败: ${err?.message || err}`,
+              dismissible: true
+            }
+            setNotification({
+              type: ToastNotificationType.Danger,
+              title: '发送受阻',
+              description: err?.message || '宿主应用程序在处理发送请求时返回异常或超时'
+            })
+          })
+      }
+
       const shittyHostApps = ['autocad']
       if (shittyHostApps.includes(hostAppName.value as string)) {
         setTimeout(() => {
-          void app.$sendBinding.send(modelCardId)
-        }, 500) // I prefer to sacrifice 500ms
+          handleSendPromise(app.$sendBinding.send(modelCardId))
+        }, 500)
       } else {
-        void app.$sendBinding.send(modelCardId)
+        handleSendPromise(app.$sendBinding.send(modelCardId))
       }
       console.log('[Publish Debug] app.$sendBinding.send invoked.')
     } catch (err: any) {
