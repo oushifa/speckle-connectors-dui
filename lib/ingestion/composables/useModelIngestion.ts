@@ -32,6 +32,12 @@ export const useModelIngestion = () => {
     progressMessage: string,
     sourceData: SourceDataInput
   ) => {
+    console.log('[Publish Debug] [Ingestion] startIngestion called for modelCard:', senderModelCard.modelCardId, {
+      projectId: senderModelCard.projectId,
+      modelId: senderModelCard.modelId,
+      progressMessage,
+      sourceData
+    })
     const { activeIngestions } = storeToRefs(store)
     const client = accountStore.getAccountClient(senderModelCard.accountId)
     const { mutate } = provideApolloClient(client)(() =>
@@ -48,17 +54,21 @@ export const useModelIngestion = () => {
       }
     })
 
+    console.log('[Publish Debug] [Ingestion] createModelIngestion raw response:', res)
+
     if (res?.errors?.length) {
       const msg = res.errors[0].message
+      console.error('[Publish Debug] [Ingestion] startIngestion returned GraphQL errors:', res.errors)
       store.setNotification({
         type: ToastNotificationType.Danger,
         title: 'Ingestion Error',
         description: msg
       })
-      throw new Error(msg)
+      throw new Error(`[GraphQL Ingestion Error] ${msg}`)
     }
 
     const ingestionId = res?.data?.projectMutations.modelIngestionMutations.create.id
+    console.log('[Publish Debug] [Ingestion] Created Ingestion ID:', ingestionId)
     if (ingestionId) {
       activeIngestions.value[senderModelCard.modelCardId] = ingestionId
     }
@@ -72,6 +82,7 @@ export const useModelIngestion = () => {
     progressMessage: string,
     progress?: number
   ) => {
+    console.log('[Publish Debug] [Ingestion] updateIngestion:', { ingestionId, progressMessage, progress })
     const client = accountStore.getAccountClient(senderModelCard.accountId)
     const { mutate } = provideApolloClient(client)(() =>
       useMutation(updateModelIngestionProgress)
@@ -88,6 +99,7 @@ export const useModelIngestion = () => {
 
     if (res?.errors?.length) {
       const msg = res.errors[0].message
+      console.error('[Publish Debug] [Ingestion] updateIngestion error:', res.errors)
       store.setNotification({
         type: ToastNotificationType.Danger,
         title: 'Ingestion Error',
@@ -105,6 +117,7 @@ export const useModelIngestion = () => {
     errorReason: string,
     errorStacktrace?: string
   ) => {
+    console.log('[Publish Debug] [Ingestion] failIngestion:', { ingestionId, errorReason, errorStacktrace })
     const client = accountStore.getAccountClient(senderModelCard.accountId)
     const { mutate } = provideApolloClient(client)(() =>
       useMutation(failModelIngestionWithError)
@@ -121,6 +134,7 @@ export const useModelIngestion = () => {
 
     if (res?.errors?.length) {
       const msg = res.errors[0].message
+      console.error('[Publish Debug] [Ingestion] failIngestion error:', res.errors)
       store.setNotification({
         type: ToastNotificationType.Danger,
         title: 'Ingestion Error',
@@ -144,6 +158,7 @@ export const useModelIngestion = () => {
     ingestionId: string,
     cancellationMessage: string = 'Cancelled by user'
   ) => {
+    console.log('[Publish Debug] [Ingestion] cancelIngestion:', { ingestionId, cancellationMessage })
     const client = accountStore.getAccountClient(senderModelCard.accountId)
     const { mutate } = provideApolloClient(client)(() =>
       useMutation(failModelIngestionWithCancel)
@@ -159,6 +174,7 @@ export const useModelIngestion = () => {
 
     if (res?.errors?.length) {
       const msg = res.errors[0].message
+      console.error('[Publish Debug] [Ingestion] cancelIngestion error:', res.errors)
       store.setNotification({
         type: ToastNotificationType.Danger,
         title: 'Ingestion Error',
@@ -182,6 +198,7 @@ export const useModelIngestion = () => {
     ingestionId: string,
     rootObjectId: string
   ) => {
+    console.log('[Publish Debug] [Ingestion] completeIngestionWithVersion:', { ingestionId, rootObjectId })
     const client = accountStore.getAccountClient(senderModelCard.accountId)
     const { mutate } = provideApolloClient(client)(() =>
       useMutation(completeModelIngestionWithVersion)
@@ -197,6 +214,7 @@ export const useModelIngestion = () => {
 
     if (res?.errors?.length) {
       const msg = res.errors[0].message
+      console.error('[Publish Debug] [Ingestion] completeIngestionWithVersion error:', res.errors)
       store.setNotification({
         type: ToastNotificationType.Danger,
         title: 'Ingestion Error',

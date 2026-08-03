@@ -150,8 +150,15 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
    * @param model
    */
   const addModel = async (model: IModelCard) => {
-    await app.$baseBinding.addModel(model)
+    console.log('[Publish Debug] hostAppStore.addModel called for modelCard:', model.modelCardId, model)
+    try {
+      await app.$baseBinding.addModel(model)
+      console.log('[Publish Debug] app.$baseBinding.addModel returned successfully.')
+    } catch (err) {
+      console.error('[Publish Debug] app.$baseBinding.addModel failed with exception:', err)
+    }
     documentModelStore.value.models.push(model)
+    console.log('[Publish Debug] Current documentModelStore models length:', documentModelStore.value.models.length)
   }
 
   /**
@@ -369,66 +376,111 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
    * @param modelId
    */
   const sendModel = async (modelCardId: string, actionSource: string) => {
+    console.group(`[Publish Debug] sendModel Triggered (source: ${actionSource})`)
+    console.log('[Publish Debug] Target modelCardId:', modelCardId)
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === modelCardId
     ) as ISenderModelCard
-    const { canCreateModelIngestion, canCreateVersion } = useCheckGraphql()
-    const canCreateIngestion = await canCreateModelIngestion(
-      model.projectId,
-      model.modelId,
-      model.accountId
-    )
 
-    // for the connectors that don't have SDK to handle graqhql
-    if (shouldHandleIngestion.value && canCreateIngestion.queryAvailable) {
-      const sourceData = {
-        sourceApplicationSlug: hostAppName.value || 'unknown',
-        sourceApplicationVersion: hostAppVersion.value?.toString() || 'unknown'
-      }
-      if (canCreateIngestion.authorized) {
-        await startIngestion(model, '开始发布', sourceData)
-        model.progress = { status: '正在转换对象...' }
-      } else {
-        setNotification({
-          type: ToastNotificationType.Warning,
-          title: '无法发布',
-          description: canCreateIngestion.message
-        })
-        return
-      }
-    } else {
-      // for the self hosters that does not have available graphql for ingestions
-      const canCreate = await canCreateVersion(
+    if (!model) {
+      console.error('[Publish Debug] Model card NOT FOUND in store for id:', modelCardId)
+      setNotification({
+        type: ToastNotificationType.Danger,
+        title: '发布错误',
+        description: `找不到对应的模型卡片 (ID: ${modelCardId})`
+      })
+      console.groupEnd()
+      return
+    }
+
+    console.log('[Publish Debug] Found target model card:', model)
+    console.log('[Publish Debug] shouldHandleIngestion:', shouldHandleIngestion.value, 'hostAppName:', hostAppName.value)
+
+    try {
+      const { canCreateModelIngestion, canCreateVersion } = useCheckGraphql()
+      console.log('[Publish Debug] Checking canCreateModelIngestion...')
+      const canCreateIngestion = await canCreateModelIngestion(
         model.projectId,
         model.modelId,
         model.accountId
       )
-      if (!canCreate.authorized) {
-        setNotification({
-          type: ToastNotificationType.Warning,
-          title: '无法发布',
-          description: canCreate.message || '已达到工作区限制'
-        })
-        return
+      console.log('[Publish Debug] canCreateModelIngestion result:', canCreateIngestion)
+
+      // for the connectors that don't have SDK to handle graqhql
+      if (shouldHandleIngestion.value && canCreateIngestion.queryAvailable) {
+        const sourceData = {
+          sourceApplicationSlug: hostAppName.value || 'unknown',
+          sourceApplicationVersion: hostAppVersion.value?.toString() || 'unknown'
+        }
+        if (canCreateIngestion.authorized) {
+          console.log('[Publish Debug] Starting ingestion via startIngestion...')
+          await startIngestion(model, '开始发布', sourceData)
+          console.log('[Publish Debug] startIngestion finished successfully.')
+          model.progress = { status: '正在转换对象...' }
+        } else {
+          console.warn('[Publish Debug] Ingestion not authorized:', canCreateIngestion.message)
+          setNotification({
+            type: ToastNotificationType.Warning,
+            title: '无法发布',
+            description: canCreateIngestion.message
+          })
+          console.groupEnd()
+          return
+        }
+      } else {
+        // for the self hosters that does not have available graphql for ingestions
+        console.log('[Publish Debug] Checking legacy canCreateVersion...')
+        const canCreate = await canCreateVersion(
+          model.projectId,
+          model.modelId,
+          model.accountId
+        )
+        console.log('[Publish Debug] canCreateVersion result:', canCreate)
+        if (!canCreate.authorized) {
+          console.warn('[Publish Debug] Version creation not authorized:', canCreate.message)
+          setNotification({
+            type: ToastNotificationType.Warning,
+            title: '无法发布',
+            description: canCreate.message || '已达到工作区限制'
+          })
+          console.groupEnd()
+          return
+        }
       }
-    }
 
-    model.latestCreatedVersionId = undefined
-    model.error = undefined
-    model.progress = { status: '开始发送...' }
-    model.expired = false
-    model.report = undefined
+      model.latestCreatedVersionId = undefined
+      model.error = undefined
+      model.progress = { status: '开始发送...' }
+      model.expired = false
+      model.report = undefined
 
-    // You should stop asking why if you saw anything related autocad..
-    // It solves the press "escape" issue.
-    // Because probably we don't give enough time to acad complete it's previos task and it stucks.
-    const shittyHostApps = ['autocad']
-    if (shittyHostApps.includes(hostAppName.value as string)) {
-      setTimeout(() => {
+      console.log('[Publish Debug] Invoking app.$sendBinding.send for modelCardId:', modelCardId)
+      // You should stop asking why if you saw anything related autocad..
+      // It solves the press "escape" issue.
+      // Because probably we don't give enough time to acad complete it's previos task and it stucks.
+      const shittyHostApps = ['autocad']
+      if (shittyHostApps.includes(hostAppName.value as string)) {
+        setTimeout(() => {
+          void app.$sendBinding.send(modelCardId)
+        }, 500) // I prefer to sacrifice 500ms
+      } else {
         void app.$sendBinding.send(modelCardId)
-      }, 500) // I prefer to sacrifice 500ms
-    } else {
-      void app.$sendBinding.send(modelCardId)
+      }
+      console.log('[Publish Debug] app.$sendBinding.send invoked.')
+    } catch (err: any) {
+      console.error('[Publish Debug] EXCEPTION in sendModel:', err)
+      model.progress = undefined
+      model.error = {
+        errorMessage: `发布流程异常: ${err?.message || err}`,
+        dismissible: true
+      }
+      setNotification({
+        type: ToastNotificationType.Danger,
+        title: '发布流程异常',
+        description: err?.message || '在发送流程中发生未捕获的异常，请查看控制台日志'
+      })
+    } finally {
+      console.groupEnd()
     }
   }
 
@@ -470,6 +522,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     versionId: string
     sendConversionResults: ConversionResult[]
   }) => {
+    console.log('[Publish Debug] setModelSendResult received:', args)
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
     ) as ISenderModelCard

@@ -244,54 +244,77 @@ const hostAppStore = useHostAppStore()
 
 // accountId, serverUrl, projectId, modelId, sendFilter, settings
 const addModel = async () => {
-  void trackEvent('DUI3 Action', {
-    name: 'Publish Wizard',
-    step: 'objects selected',
-    filter: filter.value?.typeDiscriminator
-  })
+  console.group('[Publish Debug] Wizard.addModel Clicked')
+  console.log('[Publish Debug] Selected project:', selectedProject.value)
+  console.log('[Publish Debug] Selected model:', selectedModel.value)
+  console.log('[Publish Debug] Send filter:', filter.value)
+  console.log('[Publish Debug] Account ID:', selectedAccountId.value)
 
-  const existingModel = hostAppStore.models.find(
-    (m) =>
-      m.modelId === selectedModel.value?.id &&
-      m.typeDiscriminator.includes('SenderModelCard')
-  ) as SenderModelCard
-
-  // track settings only if user changed them
-  // compare against existing model card settings
-  if (settingsWereChanged.value && settings.value) {
-    trackSettingsChange(
-      'Publish Settings Changed',
-      settings.value,
-      existingModel?.settings || hostAppStore.sendSettings || [],
-      selectedAccountId.value,
-      true
-    )
-  }
-  if (existingModel) {
-    emit('close')
-    // Patch the existing model card with new send filter and non-expired state!
-    await hostAppStore.patchModel(existingModel.modelCardId, {
-      sendFilter: filter.value as ISendFilter,
-      expired: false
+  try {
+    void trackEvent('DUI3 Action', {
+      name: 'Publish Wizard',
+      step: 'objects selected',
+      filter: filter.value?.typeDiscriminator
     })
-    void hostAppStore.sendModel(existingModel.modelCardId, 'Wizard')
-    return
+
+    const existingModel = hostAppStore.models.find(
+      (m) =>
+        m.modelId === selectedModel.value?.id &&
+        m.typeDiscriminator.includes('SenderModelCard')
+    ) as SenderModelCard
+
+    // track settings only if user changed them
+    // compare against existing model card settings
+    if (settingsWereChanged.value && settings.value) {
+      trackSettingsChange(
+        'Publish Settings Changed',
+        settings.value,
+        existingModel?.settings || hostAppStore.sendSettings || [],
+        selectedAccountId.value,
+        true
+      )
+    }
+
+    if (existingModel) {
+      console.log('[Publish Debug] Existing model card found:', existingModel.modelCardId)
+      emit('close')
+      // Patch the existing model card with new send filter and non-expired state!
+      await hostAppStore.patchModel(existingModel.modelCardId, {
+        sendFilter: filter.value as ISendFilter,
+        expired: false
+      })
+      await hostAppStore.sendModel(existingModel.modelCardId, 'Wizard')
+      console.groupEnd()
+      return
+    }
+
+    const model = new SenderModelCard()
+    model.accountId = selectedAccountId.value
+    model.serverUrl = activeAccount.value?.accountInfo.serverInfo.url as string
+    model.projectId = selectedProject.value?.id as string
+    model.modelId = selectedModel.value?.id as string
+    model.workspaceId = selectedProject.value?.workspace?.id as string
+    model.workspaceSlug = selectedProject?.value?.workspace?.slug as string
+    model.sendFilter = filter.value as ISendFilter
+    model.sendFilter.idMap = {} // do not let it null from the beginning otherwise we will end up with null state on Revit...
+    model.settings = settings.value
+    model.expired = false
+
+    console.log('[Publish Debug] Created new SenderModelCard instance:', model)
+
+    emit('close')
+    await hostAppStore.addModel(model)
+    console.log('[Publish Debug] addModel complete, now calling sendModel...')
+    await hostAppStore.sendModel(model.modelCardId, 'Wizard')
+  } catch (err: any) {
+    console.error('[Publish Debug] EXCEPTION in Wizard addModel:', err)
+    hostAppStore.setNotification({
+      type: 'danger' as any,
+      title: '发布流程异常',
+      description: err?.message || '在添加或配置模型卡片时发生异常'
+    })
+  } finally {
+    console.groupEnd()
   }
-
-  const model = new SenderModelCard()
-  model.accountId = selectedAccountId.value
-  model.serverUrl = activeAccount.value?.accountInfo.serverInfo.url as string
-  model.projectId = selectedProject.value?.id as string
-  model.modelId = selectedModel.value?.id as string
-  model.workspaceId = selectedProject.value?.workspace?.id as string
-  model.workspaceSlug = selectedProject?.value?.workspace?.slug as string
-  model.sendFilter = filter.value as ISendFilter
-  model.sendFilter.idMap = {} // do not let it null from the beginning otherwise we will end up with null state on Revit...
-  model.settings = settings.value
-  model.expired = false
-
-  emit('close')
-  await hostAppStore.addModel(model)
-  void hostAppStore.sendModel(model.modelCardId, 'Wizard')
 }
 </script>
