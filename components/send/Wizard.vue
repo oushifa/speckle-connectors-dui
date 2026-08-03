@@ -55,6 +55,9 @@
           发布
         </FormButton>
       </div>
+      <div class="mt-2 text-right text-[10px] opacity-40 font-mono select-none">
+        Debug Ver: v2026.08.03-v2 (accountId Fix)
+      </div>
     </div>
     <div v-if="urlParseError" class="p-2 text-danger">
       {{ urlParseError }}

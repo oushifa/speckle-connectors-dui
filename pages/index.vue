@@ -196,6 +196,11 @@
       v-model:open="showReceiveDialog"
       @close="showReceiveDialog = false"
     />
+    <div
+      class="fixed bottom-1 right-2 text-[10px] text-foreground-2 opacity-50 font-mono pointer-events-none z-50 select-none"
+    >
+      DUI Debug: v2026.08.03-v2
+    </div>
   </div>
 </template>
 <script setup lang="ts">

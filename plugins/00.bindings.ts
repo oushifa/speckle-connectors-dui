@@ -65,6 +65,15 @@ const isCefSharp = () => !!globalThis.CefSharp
 const isArchicad = () => isCefSharp() && !!globalThis.DG
 const isConnector = () => isWebview() || isSketchup() || isCefSharp() || isArchicad()
 
+export const DUI_DEBUG_VERSION = 'v2026.08.03-v2 (accountId Fix)'
+if (typeof window !== 'undefined') {
+  ;(window as any).__DUI_DEBUG_VERSION__ = DUI_DEBUG_VERSION
+  console.log(
+    `%c 🚀 Speckle DUI Debug Version: ${DUI_DEBUG_VERSION} 🚀 `,
+    'background: #2563eb; color: #ffffff; font-weight: bold; font-size: 14px; padding: 6px 12px; border-radius: 6px;'
+  )
+}
+
 /**
  * Here we are loading any bindings that we expect to have from all
  * connectors. If some are not present, that's okay - we're going to
