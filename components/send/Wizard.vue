@@ -71,6 +71,7 @@
   </CommonDialog>
 </template>
 <script setup lang="ts">
+import { ref, watch, computed, toRaw } from 'vue'
 import { storeToRefs } from 'pinia'
 import { provideApolloClient, useMutation, useSubscription } from '@vue/apollo-composable'
 import { ToastNotificationType } from '@speckle/ui-components'
@@ -317,8 +318,11 @@ const addModel = async () => {
     model.modelId = selectedModel.value?.id as string
     model.workspaceId = selectedProject.value?.workspace?.id as string
     model.workspaceSlug = selectedProject?.value?.workspace?.slug as string
-    model.sendFilter = filter.value as ISendFilter
-    model.sendFilter.idMap = {} // do not let it null from the beginning otherwise we will end up with null state on Revit...
+    const rawFilter = filter.value ? JSON.parse(JSON.stringify(toRaw(filter.value))) : undefined
+    model.sendFilter = rawFilter as ISendFilter
+    if (model.sendFilter) {
+      model.sendFilter.idMap = model.sendFilter.idMap || {}
+    }
     model.settings = settings.value
     model.expired = false
 
@@ -438,7 +442,8 @@ const directPublishInWizard = async () => {
     }
 
     // 4. 发起 CreateVersion Mutation 关联新版本
-    const client = accountStore.getAccountClient(selectedAccountId.value)
+    const targetAccount = accountStore.accountWithFallback(selectedAccountId.value, serverUrl)
+    const client = targetAccount?.client || activeAccount.value?.client
     const { mutate } = provideApolloClient(client)(() =>
       useMutation(createVersionMutation)
     )

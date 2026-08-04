@@ -306,11 +306,10 @@ export const useAccountStore = defineStore('accountStore', () => {
   }
 
   const getAccountClient = (accountId: string) => {
-    return (
-      accounts.value.find(
-        (account) => account.accountInfo.id === accountId
-      ) as DUIAccount
-    ).client
+    const acc = accounts.value.find(
+      (account) => account.accountInfo.id === accountId
+    ) as DUIAccount | undefined
+    return acc?.client || activeAccount.value?.client
   }
 
   const provideClients = () => {
