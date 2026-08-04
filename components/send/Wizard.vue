@@ -71,6 +71,7 @@
   </CommonDialog>
 </template>
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { provideApolloClient, useMutation, useSubscription } from '@vue/apollo-composable'
 import { ToastNotificationType } from '@speckle/ui-components'
 import { createVersionMutation } from '~/lib/graphql/mutationsAndQueries'
