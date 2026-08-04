@@ -640,15 +640,39 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
   // GENERIC STUFF
   const handleModelProgressEvents = async (args: {
     modelCardId: string
-    progress?: ModelCardProgress
+    progress?: any
   }) => {
     console.log('[Publish Debug Event] setModelProgress event received from Host App:', args)
+    
+    let targetProgress: ModelCardProgress | undefined = undefined
+    if (args.progress) {
+      const rawProgress = args.progress
+      const statusStr = rawProgress.status || rawProgress.Status || '处理中...'
+      let progressNum: number | undefined = undefined
+      
+      if (typeof rawProgress.progress === 'number') {
+        progressNum = rawProgress.progress
+      } else if (typeof rawProgress.Progress === 'number') {
+        progressNum = rawProgress.Progress
+      }
+
+      targetProgress = {
+        status: statusStr,
+        progress: progressNum
+      }
+    }
+
+    // 触发 patchModel 深度响应式全量更新
+    await patchModel(args.modelCardId, {
+      progress: targetProgress
+    })
+
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
     ) as IModelCard
-    model.progress = args.progress
 
     if (
+      model &&
       model.typeDiscriminator.includes('SenderModelCard') &&
       shouldHandleIngestion.value // for the connectors that don't have SDK to handle graqhql
     ) {

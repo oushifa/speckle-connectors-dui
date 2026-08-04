@@ -44,24 +44,15 @@
       />
       <div
         v-tippy="!canPublish && !isLoadingPermissions ? publishLimitMessage : ''"
-        class="mt-2 flex space-x-2"
+        class="mt-2"
       >
         <FormButton
-          class="flex-1"
-          :disabled="!canPublish || isLoadingPermissions || isDirectPublishingInWizard"
+          full-width
+          :disabled="!canPublish || isLoadingPermissions"
           :loading="isLoadingPermissions"
           @click="addModel"
         >
-          发布 (宿主软件)
-        </FormButton>
-        <FormButton
-          class="flex-1"
-          color="outline"
-          :disabled="!canPublish || isLoadingPermissions"
-          :loading="isDirectPublishingInWizard"
-          @click="directPublishInWizard"
-        >
-          直连发布新版本
+          发布
         </FormButton>
       </div>
     </div>
@@ -350,142 +341,5 @@ const addModel = async () => {
   }
 }
 
-const isDirectPublishingInWizard = ref(false)
-const directPublishInWizard = async () => {
-  if (!selectedProject.value || !selectedModel.value) return
-  isDirectPublishingInWizard.value = true
-  try {
-    const serverUrl = activeAccount.value?.accountInfo.serverInfo.url as string
-    const token = activeAccount.value?.accountInfo.token as string
-    const projectId = selectedProject.value.id
-    const modelId = selectedModel.value.id
 
-    // 1. 确保将模型卡片记录插入 Store
-    const existingModel = hostAppStore.models.find(
-      (m) => m.modelId === modelId && m.typeDiscriminator.includes('SenderModelCard')
-    ) as SenderModelCard
-
-    let cardId = existingModel?.modelCardId
-
-    if (existingModel) {
-      await hostAppStore.patchModel(existingModel.modelCardId, {
-        accountId: selectedAccountId.value,
-        serverUrl,
-        workspaceId: selectedProject.value?.workspace?.id as string,
-        workspaceSlug: selectedProject?.value?.workspace?.slug as string,
-        sendFilter: filter.value as ISendFilter,
-        expired: false,
-        progress: { status: '正在通过直连通道上传 3D 对象并发布新版本...' }
-      })
-    } else {
-      const model = new SenderModelCard()
-      model.accountId = selectedAccountId.value
-      model.serverUrl = serverUrl
-      model.projectId = projectId
-      model.modelId = modelId
-      model.workspaceId = selectedProject.value?.workspace?.id as string
-      model.workspaceSlug = selectedProject?.value?.workspace?.slug as string
-      model.sendFilter = filter.value as ISendFilter
-      model.sendFilter.idMap = {}
-      model.settings = settings.value
-      model.expired = false
-      model.progress = { status: '正在通过直连通道上传 3D 对象并发布新版本...' }
-      cardId = model.modelCardId
-      await hostAppStore.addModel(model)
-    }
-
-    // 2. 构造合规的 32 位 MD5 几何 Base 对象 ID
-    const childObjectId = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
-    const rootObjectId = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
-
-    const childMeshObject = {
-      id: childObjectId,
-      speckle_type: 'Objects.Geometry.Mesh',
-      vertices: [0, 0, 0, 100, 0, 0, 100, 100, 0, 0, 100, 0],
-      faces: [4, 0, 1, 2, 3],
-      units: 'mm',
-      category: filter.value?.name || 'Structural Framing',
-      name: 'Wizard_Direct_Element'
-    }
-
-    const rootCollectionObject = {
-      id: rootObjectId,
-      speckle_type: 'Speckle.Core.Models.Collection',
-      name: 'Wizard_Publish_Collection',
-      elements: [{ referencedId: childObjectId, speckle_type: 'reference' }],
-      totalChildrenCount: 1,
-      units: 'mm'
-    }
-
-    // 3. 上传 REST 对象数据
-    const objectsBuffer = JSON.stringify([rootCollectionObject, childMeshObject])
-    const boundary = '--------------------------' + Math.random().toString(36).substring(2, 12)
-
-    let postData = `--${boundary}\r\n`
-    postData += `Content-Disposition: form-data; name="batch1"; filename="batch1.json"\r\n`
-    postData += `Content-Type: application/json\r\n\r\n`
-    postData += objectsBuffer + `\r\n`
-    postData += `--${boundary}--\r\n`
-
-    const restRes = await fetch(`${serverUrl}/objects/${projectId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': `multipart/form-data; boundary=${boundary}`,
-        'Authorization': `Bearer ${token}`
-      },
-      body: postData
-    })
-
-    if (restRes.status >= 400) {
-      const errText = await restRes.text()
-      throw new Error(`REST 上传失败 (${restRes.status}): ${errText}`)
-    }
-
-    // 4. 发起 CreateVersion Mutation 关联新版本
-    const targetAccount = accountStore.accountWithFallback(selectedAccountId.value, serverUrl)
-    const client = targetAccount?.client || activeAccount.value?.client
-    const { mutate } = provideApolloClient(client)(() =>
-      useMutation(createVersionMutation)
-    )
-
-    const res = await mutate({
-      input: {
-        projectId,
-        modelId,
-        objectId: rootObjectId,
-        message: '通过发布向导直连发布的全新版本',
-        sourceApplication: 'Revit 2026 Wizard Direct'
-      }
-    })
-
-    const versionId = res?.data?.versionMutations?.create?.id
-    if (versionId && cardId) {
-      await hostAppStore.patchModel(cardId, {
-        latestCreatedVersionId: versionId,
-        progress: undefined,
-        expired: false,
-        report: [{ status: 1, message: '通过发布向导直连生成新版本成功！' }]
-      })
-
-      hostAppStore.setNotification({
-        type: ToastNotificationType.Success,
-        title: '新版本发布成功！',
-        description: `模型新版本已生成！Version ID: ${versionId}`,
-        autoClose: true
-      })
-      emit('close')
-    } else {
-      throw new Error('未能取得有效的 Version ID')
-    }
-  } catch (err: any) {
-    console.error('[Wizard Direct Publish Error]', err)
-    hostAppStore.setNotification({
-      type: ToastNotificationType.Danger,
-      title: '直连发布失败',
-      description: err?.message || '直连发布遇到异常'
-    })
-  } finally {
-    isDirectPublishingInWizard.value = false
-  }
-}
 </script>
