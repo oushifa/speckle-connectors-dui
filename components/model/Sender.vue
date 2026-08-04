@@ -31,6 +31,14 @@
         <FormButton size="sm" color="outline" @click.stop="saveFilter()">
           保存
         </FormButton>
+        <FormButton
+          size="sm"
+          color="subtle"
+          :loading="isDirectPublishing"
+          @click.stop="directPublishTestVersion()"
+        >
+          直连发版测试
+        </FormButton>
         <div v-tippy="!canCreateVersionPerm ? canCreateVersionMessage : ''">
           <FormButton
             size="sm"
@@ -124,8 +132,10 @@ import {
   useMutation,
   useSubscription
 } from '@vue/apollo-composable'
-import { useAccountStore, type DUIAccount } from '~/store/accounts'
-import { setVersionMessageMutation } from '~/lib/graphql/mutationsAndQueries'
+import {
+  setVersionMessageMutation,
+  createVersionMutation
+} from '~/lib/graphql/mutationsAndQueries'
 import { workspacePlanUsageUpdatedSubscription } from '~/lib/workspaces/graphql/subscriptions'
 import { useCheckGraphql } from '~/lib/core/composables/useCheckGraphql'
 import { useCustomPermissions } from '~/lib/core/composables/customPermissions'
@@ -338,6 +348,113 @@ const saveFilterAndSend = async () => {
   await saveFilter()
   store.sendModel(props.modelCard.modelCardId, 'Filter')
   hasSetVersionMessage.value = false
+}
+
+const isDirectPublishing = ref(false)
+const directPublishTestVersion = async () => {
+  isDirectPublishing.value = true
+  store.patchModel(props.modelCard.modelCardId, {
+    progress: { status: '正在通过前端 REST 接口直连上传几何对象...' }
+  })
+  try {
+    const serverUrl = account.accountInfo.serverInfo.url
+    const token = account.accountInfo.token
+    const projectId = props.modelCard.projectId
+    const modelId = props.modelCard.modelId
+
+    // 构造 32 位 MD5 合规几何对象 ID
+    const childObjectId = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
+    const rootObjectId = Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
+
+    const childMeshObject = {
+      id: childObjectId,
+      speckle_type: 'Objects.Geometry.Mesh',
+      vertices: [0, 0, 0, 100, 0, 0, 100, 100, 0, 0, 100, 0],
+      faces: [4, 0, 1, 2, 3],
+      units: 'mm',
+      category: props.modelCard.sendFilter?.name || 'Structural Framing',
+      name: 'Direct_Upload_Element'
+    }
+
+    const rootCollectionObject = {
+      id: rootObjectId,
+      speckle_type: 'Speckle.Core.Models.Collection',
+      name: 'Direct_Publish_Collection',
+      elements: [{ referencedId: childObjectId, speckle_type: 'reference' }],
+      totalChildrenCount: 1,
+      units: 'mm'
+    }
+
+    // 1. 使用 REST 接口上传 Multipart Payload
+    const objectsBuffer = JSON.stringify([rootCollectionObject, childMeshObject])
+    const boundary = '--------------------------' + Math.random().toString(36).substring(2, 12)
+
+    let postData = `--${boundary}\r\n`
+    postData += `Content-Disposition: form-data; name="batch1"; filename="batch1.json"\r\n`
+    postData += `Content-Type: application/json\r\n\r\n`
+    postData += objectsBuffer + `\r\n`
+    postData += `--${boundary}--\r\n`
+
+    const restRes = await fetch(`${serverUrl}/objects/${projectId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Authorization': `Bearer ${token}`
+      },
+      body: postData
+    })
+
+    if (restRes.status >= 400) {
+      const errText = await restRes.text()
+      throw new Error(`REST 上传失败 (${restRes.status}): ${errText}`)
+    }
+
+    store.patchModel(props.modelCard.modelCardId, {
+      progress: { status: '对象已成功上传入库，正在生成 Version 记录...' }
+    })
+
+    // 2. 发起 Version 关联突变
+    const { mutate } = provideApolloClient(account.client)(() =>
+      useMutation(createVersionMutation)
+    )
+
+    const res = await mutate({
+      input: {
+        projectId,
+        modelId,
+        objectId: rootObjectId,
+        message: 'DUI 前端直连发版测试新版本',
+        sourceApplication: 'Revit 2026 Direct Upload'
+      }
+    })
+
+    const versionId = res?.data?.versionMutations?.create?.id
+    if (versionId) {
+      store.patchModel(props.modelCard.modelCardId, {
+        latestCreatedVersionId: versionId,
+        progress: undefined,
+        expired: false,
+        report: [{ status: 1, message: '前端直连 REST 几何上传成功！' }]
+      })
+      store.setNotification({
+        type: ToastNotificationType.Success,
+        title: '发版成功！',
+        description: `新版本已发布！Version ID: ${versionId}`,
+        autoClose: true
+      })
+    } else {
+      throw new Error('未获得有效的 Version ID')
+    }
+  } catch (err: any) {
+    console.error('[Direct Publish Error]', err)
+    store.patchModel(props.modelCard.modelCardId, {
+      progress: undefined,
+      error: { errorMessage: `直连发版失败: ${err?.message || err}`, dismissible: true }
+    })
+  } finally {
+    isDirectPublishing.value = false
+    openFilterDialog.value = false
+  }
 }
 
 const isSendSettingsMissing = computed(

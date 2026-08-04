@@ -40,6 +40,8 @@ export interface ISendBindingEvents
 }
 
 export class MockedSendBinding implements ISendBinding {
+  private listeners: Record<string, Function[]> = {}
+
   public async getSendFilters() {
     return await []
   }
@@ -50,22 +52,48 @@ export class MockedSendBinding implements ISendBinding {
 
   public async send(modelCardId: string) {
     console.log('[Publish Debug] MockedSendBinding.send called for modelCardId:', modelCardId, '(Running on Web Mock mode)')
+    
+    // 在 Mock 环境下模拟进度推进
+    setTimeout(() => {
+      this.emit('setModelProgress', {
+        modelCardId,
+        progress: { status: '正在转换 3D 几何对象 (Mock 模拟)...', progress: 0.5 }
+      })
+    }, 800)
+
+    setTimeout(() => {
+      this.emit('setModelSendResult', {
+        modelCardId,
+        versionId: 'mock_ver_' + Math.random().toString(36).substring(2, 8),
+        sendConversionResults: [
+          { status: 1, message: '转换成功 (Mock 模拟)' }
+        ]
+      })
+    }, 2000)
+
     return Promise.resolve()
   }
 
-  public async cancelSend(_modelCardId: string) {
-    return await console.log('no way dude')
+  public async cancelSend(modelCardId: string) {
+    console.log('[Publish Debug] MockedSendBinding.cancelSend:', modelCardId)
   }
 
   public async showDevTools() {
-    await console.log('No way dude')
+    console.log('Show dev tools')
   }
 
   public async openUrl(url: string) {
-    await window.open(url)
+    window.open(url)
   }
 
-  public on() {
-    return
+  public on(event: string, fn: Function) {
+    if (!this.listeners[event]) this.listeners[event] = []
+    this.listeners[event].push(fn)
+  }
+
+  private emit(event: string, data: any) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach((fn) => fn(data))
+    }
   }
 }

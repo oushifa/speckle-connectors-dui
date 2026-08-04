@@ -463,6 +463,15 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
         promise
           .then((res) => {
             console.log('[Publish Debug] app.$sendBinding.send resolved successfully with:', res)
+            // C# 宿主已接收 Send 指令。若 5 秒内未上报 setModelProgress，更新提示状态帮助诊断
+            setTimeout(() => {
+              if (model.progress && model.progress.status === '开始发送，等待宿主响应...') {
+                console.warn('[Publish Debug] 5秒内未收到 setModelProgress 回调。请检查在 Revit 中配置的分类过滤器 (Categories/Filter) 是否包含有效 3D 构件元素。')
+                model.progress = {
+                  status: '宿主已接收指令，正等待构件处理（若无后续进度，请检查选择的过滤器分类下是否有模型元素）'
+                }
+              }
+            }, 5000)
           })
           .catch((err) => {
             console.error('[Publish Debug] app.$sendBinding.send Promise REJECTED:', err)
@@ -633,6 +642,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     modelCardId: string
     progress?: ModelCardProgress
   }) => {
+    console.log('[Publish Debug Event] setModelProgress event received from Host App:', args)
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
     ) as IModelCard
@@ -658,6 +668,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     modelCardId: string
     error: string | { errorMessage: string; dismissible?: boolean }
   }) => {
+    console.error('[Publish Debug Event] setModelError event received from Host App:', args)
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
     ) as IModelCard
