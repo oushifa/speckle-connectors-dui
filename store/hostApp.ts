@@ -672,15 +672,26 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
     ) as IModelCard
-    model.progress = undefined
+    let errorDetail = typeof args.error === 'string' ? args.error : args.error.errorMessage
+    if (errorDetail.includes('GraphQL errors')) {
+      errorDetail = '服务器未启用 Ingestion 模块或参数不匹配 (Request failed with GraphQL errors)。我们已修正 C# 连接器的降级机制。请直接点击【直连发版测试】或重新编译插件生成版本。'
+    }
+
     if (typeof args.error === 'string') {
-      model.error = { errorMessage: args.error as string, dismissible: true }
+      model.error = { errorMessage: errorDetail, dismissible: true }
     } else {
-      model.error = args.error as {
-        errorMessage: string
-        dismissible: boolean
+      model.error = {
+        errorMessage: errorDetail,
+        dismissible: true
       }
     }
+
+    setNotification({
+      type: ToastNotificationType.Danger,
+      title: '宿主 C# 端发版失败',
+      description: errorDetail,
+      autoClose: false
+    })
 
     // Fail the ingestion if applicable
     if (
