@@ -27,6 +27,18 @@ export interface ISendBindingEvents
     versionId: string
     sendConversionResults: ConversionResult[]
   }) => void
+  /**
+   * Per-task (lane) progress for multi-send operations, e.g. the RVT file upload lane that
+   * only reports through this event. `part`/`totalParts` are present for chunked updates.
+   */
+  setModelTaskProgress: (args: {
+    modelCardId: string
+    taskId?: string
+    status?: string
+    progress?: number | null
+    part?: number | null
+    totalParts?: number | null
+  }) => void
   setIdMap: (args: {
     modelCardId: string
     idMap: Record<string, string>

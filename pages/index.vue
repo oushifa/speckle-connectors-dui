@@ -4,6 +4,10 @@
       <div v-if="!config.isDevMode" class="px-1">
         <CommonUpdateAlert />
       </div>
+      <!-- Server selector: pick which server DUI connects to -->
+      <div class="px-1 mt-1">
+        <ServersServerSelector />
+      </div>
       <!-- IMPORTANT CHECK!! otherwise host app communication corrputed for many different reasons -->
       <div v-if="accounts.length != 0">
         <div

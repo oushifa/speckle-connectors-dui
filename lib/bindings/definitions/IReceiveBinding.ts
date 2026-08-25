@@ -23,6 +23,17 @@ export interface IReceiveBindingEvents
     bakedObjectIds: string[]
     conversionResults: ConversionResult[]
   }) => void
+  /**
+   * Per-task (lane) progress for multi-send operations; surfaced on the card progress area.
+   */
+  setModelTaskProgress: (args: {
+    modelCardId: string
+    taskId?: string
+    status?: string
+    progress?: number | null
+    part?: number | null
+    totalParts?: number | null
+  }) => void
 }
 
 export class MockedReceiveBinding implements IReceiveBinding {

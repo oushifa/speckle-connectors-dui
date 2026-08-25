@@ -44,8 +44,13 @@ export class GenericBridge extends BaseBridge {
     for (const methodName of this.availableMethodNames) {
       const lowercasedMethodName = lowercaseMethodName(methodName)
       const hoistTarget = this as unknown as Record<string, object>
+      // Send/receive are long-running: the host app reports progress & completion via events
+      // (setModelProgress / setModelTaskProgress / setModelSendResult / setModelError), so the
+      // default 60s RPC timeout must not reject the call while a large upload is still running.
+      const isLongRunning =
+        lowercasedMethodName === 'send' || lowercasedMethodName === 'receive'
       hoistTarget[lowercasedMethodName] = (...args: unknown[]) =>
-        this.runMethod(methodName, args)
+        this.runMethod(methodName, args, !isLongRunning)
     }
 
     return true

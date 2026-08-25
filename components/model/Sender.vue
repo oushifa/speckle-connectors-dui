@@ -117,6 +117,7 @@ import type { ModelCardNotification } from '~/lib/models/card/notification'
 import type { ISendFilter, ISenderModelCard } from '~/lib/models/card/send'
 import type { ProjectModelGroup } from '~/store/hostApp'
 import { useHostAppStore } from '~/store/hostApp'
+import { useAccountStore, type DUIAccount } from '~/store/accounts'
 import { useMixpanel } from '~/lib/core/composables/mixpanel'
 import { ToastNotificationType, ValidationHelpers } from '@speckle/ui-components'
 import {

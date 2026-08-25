@@ -662,10 +662,10 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
       }
     }
 
-    // 触发 patchModel 深度响应式全量更新
-    await patchModel(args.modelCardId, {
-      progress: targetProgress
-    })
+    // 触发 patchModel 深度响应式全量更新。
+    // 注意：progress 是 DUI 专用 UI 字段，宿主端 ModelCard 并不持久化它，
+    // 因此不发起 updateModel 往返，避免每个进度事件都阻塞在宿主写入上。
+    await patchModel(args.modelCardId, { progress: targetProgress }, false)
 
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
@@ -686,6 +686,49 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
         )
       }
     }
+  }
+
+  /**
+   * 处理按任务/车道上报的进度（setModelTaskProgress），例如 Revit 多车道发送中
+   * 仅通过该事件上报的 RVT 文件上传进度。统一展示在卡片进度区。
+   */
+  const handleModelTaskProgressEvents = async (args: {
+    modelCardId: string
+    taskId?: string
+    status?: string
+    progress?: number | null
+    part?: number | null
+    totalParts?: number | null
+  }) => {
+    const model = documentModelStore.value.models.find(
+      (m) => m.modelCardId === args.modelCardId
+    ) as IModelCard | undefined
+
+    const statusStr =
+      args.status ||
+      (args.part != null && args.totalParts != null
+        ? `正在处理分片 ${args.part}/${args.totalParts}`
+        : '处理中...')
+    const progressNum =
+      typeof args.progress === 'number' ? args.progress : undefined
+
+    // Speckle 模型车道会把聚合进度镜像一份到任务车道（内容相同），
+    // 跳过重复值可避免重复的响应式更新。
+    const current = model?.progress
+    if (
+      current &&
+      current.status === statusStr &&
+      current.progress === progressNum
+    ) {
+      return
+    }
+
+    // progress 为 DUI 专用字段，不同步回宿主。
+    await patchModel(
+      args.modelCardId,
+      { progress: { status: statusStr, progress: progressNum } },
+      false
+    )
   }
 
   const setModelError = async (args: {
@@ -737,6 +780,8 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
   // is hoisted as a separate global js object.
   app.$sendBinding?.on('setModelProgress', handleModelProgressEvents)
   app.$receiveBinding?.on('setModelProgress', handleModelProgressEvents)
+  app.$sendBinding?.on('setModelTaskProgress', handleModelTaskProgressEvents)
+  app.$receiveBinding?.on('setModelTaskProgress', handleModelTaskProgressEvents)
 
   app.$baseBinding?.on('setGlobalNotification', setNotification)
   app.$sendBinding?.on('setGlobalNotification', setNotification)
@@ -1013,6 +1058,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     getSendSettings,
     setModelSendResult,
     setModelReceiveResult,
-    handleModelProgressEvents
+    handleModelProgressEvents,
+    handleModelTaskProgressEvents
   }
 })

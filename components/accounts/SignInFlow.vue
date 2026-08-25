@@ -27,12 +27,17 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useAuthManager } from '~/lib/authn/useAuthManager'
 import type { BaseBridge } from '~/lib/bridge/base'
 import getConfig from '~/env-config'
+import { useServerStore } from '~/store/servers'
 
 const customServerUrl = ref<string | undefined>('')
 const showCustomServerInput = ref(false)
+
+const serverStore = useServerStore()
+const { activeServer } = storeToRefs(serverStore)
 
 const { $accountBinding } = useNuxtApp()
 const canAddAccount = ['AddAccount', 'addAccount'].some((name) =>
@@ -41,10 +46,21 @@ const canAddAccount = ['AddAccount', 'addAccount'].some((name) =>
 
 const { generateChallenge } = useAuthManager()
 
+const getTargetServerUrl = (): string => {
+  // 1. explicit custom URL typed by the user wins
+  if (customServerUrl.value) {
+    return new URL(customServerUrl.value).origin
+  }
+  // 2. the server selected on the home page
+  if (activeServer.value?.url) {
+    return activeServer.value.url
+  }
+  // 3. fall back to the build-time configured server
+  return getConfig('serverUrl')
+}
+
 const logIn = () => {
-  const serverUrl = customServerUrl.value
-    ? new URL(customServerUrl.value).origin
-    : getConfig('serverUrl')
+  const serverUrl = getTargetServerUrl()
   const challenge = generateChallenge(serverUrl)
   // const authUrl = `${serverUrl}/authn/verify/sdui/${challenge}`
   const authUrl = `${serverUrl}/lowcef.html?appId=sdui&challenge=${challenge}`
