@@ -17,7 +17,6 @@ import { setContext } from '@apollo/client/link/context'
 import { useHostAppStore } from '~/store/hostApp'
 import { ToastNotificationType } from '@speckle/ui-components'
 import { logToSeq } from '~/lib/logger/composables/useLogger'
-import { useServerStore } from '~/store/servers'
 
 export type DUIAccount = {
   /** account info coming from the host app */
@@ -56,18 +55,8 @@ export const useAccountStore = defineStore('accountStore', () => {
 
   /**
    * Returns either the default account or the last account the user has selected.
-   * If a server is selected on the home page, an account belonging to that
-   * server takes priority.
    */
   const activeAccount = computed(() => {
-    const serverStore = useServerStore()
-    const serverUrl = serverStore.activeServer?.url
-    if (serverUrl) {
-      const serverAccount = accounts.value.find(
-        (acc) => acc.accountInfo.serverInfo.url === serverUrl
-      )
-      if (serverAccount) return serverAccount
-    }
     return userSelectedAccount.value || accounts.value[0]
   })
 
