@@ -1,6 +1,9 @@
 /* eslint-disable */
 import * as types from './graphql';
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+// Used as a runtime fallback when an operation is missing from the generated `documents` map
+// (see the `graphql()` implementation at the bottom of this file).
+import { gql } from '@apollo/client/core';
 
 /**
  * Map of all GraphQL operations in the project.
@@ -334,7 +337,19 @@ export function graphql(source: "\n  query IssuesList($projectId: String!) {\n  
 export function graphql(source: "\n  subscription WorkspacePlanUsageUpdated($input: WorkspacePlanUsageSubscriptionInput!) {\n    workspacePlanUsageUpdated(input: $input)\n  }\n"): (typeof documents)["\n  subscription WorkspacePlanUsageUpdated($input: WorkspacePlanUsageSubscriptionInput!) {\n    workspacePlanUsageUpdated(input: $input)\n  }\n"];
 
 export function graphql(source: string) {
-  return (documents as any)[source] ?? {};
+  const document = (documents as any)[source];
+  if (document) return document;
+
+  // The generated map is keyed by the *exact* query source string. If a query is edited
+  // without re-running `npm run gqlgen`, this lookup misses. Returning `{}` here makes Apollo
+  // throw "Expecting a parsed GraphQL document" while a component is setting up, which
+  // silently kills the whole component (e.g. model cards never rendered at all).
+  // Parse at runtime instead, and warn loudly so the stale artifact gets regenerated.
+  console.warn(
+    '[gql] Operation missing from the generated documents map - parsing at runtime. Run `npm run gqlgen` to regenerate:\n' +
+      source.trim().split('\n')[0]
+  );
+  return gql(source);
 }
 
 export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;
