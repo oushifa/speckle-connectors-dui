@@ -28,4 +28,26 @@ export class BaseBridge {
     const parsedPayload = payload ? (JSON.parse(payload) as unknown) : null
     this.emitter.emit(eventName, parsedPayload)
   }
+
+  /**
+   * Emits an event whose payload was pushed inline by the host application as a
+   * Base64 encoded UTF-8 JSON string.
+   *
+   * Unlike `emitResponseReady` (which calls back into the host via `GetCallResult`),
+   * this needs no round-trip, so the event still reaches the UI immediately while the
+   * host app is busy running the operation - e.g. progress updates during a long send.
+   */
+  emitPayload(eventName: string, base64Payload: string) {
+    try {
+      const binary = atob(base64Payload)
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i)
+      }
+      const json = new TextDecoder('utf-8').decode(bytes)
+      this.emitter.emit(eventName, (json ? JSON.parse(json) : null) as unknown)
+    } catch (e) {
+      console.error(`Failed to emit payload for ${eventName}`, e)
+    }
+  }
 }
