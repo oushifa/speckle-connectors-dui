@@ -150,15 +150,25 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
    * @param model
    */
   const addModel = async (model: IModelCard) => {
-    console.log('[Publish Debug] hostAppStore.addModel called for modelCard:', model.modelCardId, model)
+    console.log(
+      '[Publish Debug] hostAppStore.addModel called for modelCard:',
+      model.modelCardId,
+      model
+    )
     try {
       await app.$baseBinding.addModel(model)
       console.log('[Publish Debug] app.$baseBinding.addModel returned successfully.')
     } catch (err) {
-      console.error('[Publish Debug] app.$baseBinding.addModel failed with exception:', err)
+      console.error(
+        '[Publish Debug] app.$baseBinding.addModel failed with exception:',
+        err
+      )
     }
     documentModelStore.value.models.push(model)
-    console.log('[Publish Debug] Current documentModelStore models length:', documentModelStore.value.models.length)
+    console.log(
+      '[Publish Debug] Current documentModelStore models length:',
+      documentModelStore.value.models.length
+    )
   }
 
   /**
@@ -383,7 +393,10 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     ) as ISenderModelCard
 
     if (!model) {
-      console.error('[Publish Debug] Model card NOT FOUND in store for id:', modelCardId)
+      console.error(
+        '[Publish Debug] Model card NOT FOUND in store for id:',
+        modelCardId
+      )
       setNotification({
         type: ToastNotificationType.Danger,
         title: '发布错误',
@@ -394,7 +407,12 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     }
 
     console.log('[Publish Debug] Found target model card:', model)
-    console.log('[Publish Debug] shouldHandleIngestion:', shouldHandleIngestion.value, 'hostAppName:', hostAppName.value)
+    console.log(
+      '[Publish Debug] shouldHandleIngestion:',
+      shouldHandleIngestion.value,
+      'hostAppName:',
+      hostAppName.value
+    )
 
     model.latestCreatedVersionId = undefined
     model.error = undefined
@@ -424,7 +442,10 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
           console.log('[Publish Debug] startIngestion finished successfully.')
           model.progress = { status: '正在转换对象...' }
         } else {
-          console.warn('[Publish Debug] Ingestion not authorized:', canCreateIngestion.message)
+          console.warn(
+            '[Publish Debug] Ingestion not authorized:',
+            canCreateIngestion.message
+          )
           model.progress = undefined
           setNotification({
             type: ToastNotificationType.Warning,
@@ -444,7 +465,10 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
         )
         console.log('[Publish Debug] canCreateVersion result:', canCreate)
         if (!canCreate.authorized) {
-          console.warn('[Publish Debug] Version creation not authorized:', canCreate.message)
+          console.warn(
+            '[Publish Debug] Version creation not authorized:',
+            canCreate.message
+          )
           model.progress = undefined
           setNotification({
             type: ToastNotificationType.Warning,
@@ -458,23 +482,49 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
 
       model.progress = { status: '开始发送，等待宿主响应...' }
 
-      console.log('[Publish Debug] Invoking app.$sendBinding.send for modelCardId:', modelCardId)
+      console.log(
+        '[Publish Debug] Invoking app.$sendBinding.send for modelCardId:',
+        new Date().toISOString(),
+        modelCardId
+      )
+      // 从"发出指令"起算 5 秒：期间若没有任何进度上报，给出排查提示。
+      // 注意按 id 重新查找最新对象，避免拿到已被替换的旧引用。
+      const progressHintTimer = setTimeout(() => {
+        const current = documentModelStore.value.models.find(
+          (m) => m.modelCardId === modelCardId
+        ) as ISenderModelCard | undefined
+        if (
+          current?.progress &&
+          current.progress.status === '开始发送，等待宿主响应...'
+        ) {
+          console.warn(
+            '[Publish Debug]',
+            new Date().toISOString(),
+            '发出指令 5 秒内未收到任何 setModelProgress 上报。'
+          )
+          current.progress = {
+            status:
+              '宿主已接收指令，正等待构件处理（若无后续进度，请检查选择的过滤器分类下是否有模型元素）'
+          }
+        }
+      }, 5000)
+
       const handleSendPromise = (promise: Promise<unknown>) => {
         promise
           .then((res) => {
-            console.log('[Publish Debug] app.$sendBinding.send resolved successfully with:', res)
-            // C# 宿主已接收 Send 指令。若 5 秒内未上报 setModelProgress，更新提示状态帮助诊断
-            setTimeout(() => {
-              if (model.progress && model.progress.status === '开始发送，等待宿主响应...') {
-                console.warn('[Publish Debug] 5秒内未收到 setModelProgress 回调。请检查在 Revit 中配置的分类过滤器 (Categories/Filter) 是否包含有效 3D 构件元素。')
-                model.progress = {
-                  status: '宿主已接收指令，正等待构件处理（若无后续进度，请检查选择的过滤器分类下是否有模型元素）'
-                }
-              }
-            }, 5000)
+            clearTimeout(progressHintTimer)
+            console.log(
+              '[Publish Debug] app.$sendBinding.send resolved successfully with:',
+              new Date().toISOString(),
+              res
+            )
           })
           .catch((err) => {
-            console.error('[Publish Debug] app.$sendBinding.send Promise REJECTED:', err)
+            clearTimeout(progressHintTimer)
+            console.error(
+              '[Publish Debug] app.$sendBinding.send Promise REJECTED:',
+              err
+            )
             model.progress = undefined
             model.error = {
               errorMessage: `宿主应用程序发送失败: ${err?.message || err}`,
@@ -552,7 +602,11 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
     versionId: string
     sendConversionResults: ConversionResult[]
   }) => {
-    console.log('[Publish Debug] setModelSendResult received:', args)
+    console.log(
+      '[Publish Debug] setModelSendResult received:',
+      new Date().toISOString(),
+      args.modelCardId
+    )
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
     ) as ISenderModelCard
@@ -638,18 +692,35 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
   app.$receiveBinding?.on('setModelReceiveResult', setModelReceiveResult)
 
   // GENERIC STUFF
+  /**
+   * 把进度写到卡片上。
+   *
+   * 这里刻意「就地修改」当前模型对象的 progress，而不是走 patchModel 的整体替换：
+   * 替换数组元素会让别处（sendModel / 诊断定时器 / 已渲染组件）持有的旧对象引用失联，
+   * 就地赋值能保证组件必定重渲染。
+   * progress 是 DUI 专用 UI 字段（宿主端 ModelCard 不持久化它），因此不同步回宿主。
+   */
+  const applyModelProgress = (
+    modelCardId: string,
+    progress: ModelCardProgress | undefined
+  ) => {
+    const model = documentModelStore.value.models.find(
+      (m) => m.modelCardId === modelCardId
+    ) as IModelCard | undefined
+    if (!model) return
+    model.progress = progress
+  }
+
   const handleModelProgressEvents = async (args: {
     modelCardId: string
     progress?: any
   }) => {
-    console.log('[Publish Debug Event] setModelProgress event received from Host App:', args)
-    
     let targetProgress: ModelCardProgress | undefined = undefined
     if (args.progress) {
       const rawProgress = args.progress
       const statusStr = rawProgress.status || rawProgress.Status || '处理中...'
       let progressNum: number | undefined = undefined
-      
+
       if (typeof rawProgress.progress === 'number') {
         progressNum = rawProgress.progress
       } else if (typeof rawProgress.Progress === 'number') {
@@ -662,10 +733,14 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
       }
     }
 
-    // 触发 patchModel 深度响应式全量更新。
-    // 注意：progress 是 DUI 专用 UI 字段，宿主端 ModelCard 并不持久化它，
-    // 因此不发起 updateModel 往返，避免每个进度事件都阻塞在宿主写入上。
-    await patchModel(args.modelCardId, { progress: targetProgress }, false)
+    console.log(
+      '[Publish Debug Event] setModelProgress event received from Host App:',
+      new Date().toISOString(),
+      args.modelCardId,
+      JSON.stringify(targetProgress)
+    )
+
+    applyModelProgress(args.modelCardId, targetProgress)
 
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
@@ -692,7 +767,7 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
    * 处理按任务/车道上报的进度（setModelTaskProgress），例如 Revit 多车道发送中
    * 仅通过该事件上报的 RVT 文件上传进度。统一展示在卡片进度区。
    */
-  const handleModelTaskProgressEvents = async (args: {
+  const handleModelTaskProgressEvents = (args: {
     modelCardId: string
     taskId?: string
     status?: string
@@ -709,39 +784,45 @@ export const useHostAppStore = defineStore('hostAppStore', () => {
       (args.part != null && args.totalParts != null
         ? `正在处理分片 ${args.part}/${args.totalParts}`
         : '处理中...')
-    const progressNum =
-      typeof args.progress === 'number' ? args.progress : undefined
+    const progressNum = typeof args.progress === 'number' ? args.progress : undefined
 
     // Speckle 模型车道会把聚合进度镜像一份到任务车道（内容相同），
     // 跳过重复值可避免重复的响应式更新。
     const current = model?.progress
-    if (
-      current &&
-      current.status === statusStr &&
-      current.progress === progressNum
-    ) {
+    if (current && current.status === statusStr && current.progress === progressNum) {
       return
     }
 
-    // progress 为 DUI 专用字段，不同步回宿主。
-    await patchModel(
+    console.log(
+      '[Publish Debug Event] setModelTaskProgress event received from Host App:',
+      new Date().toISOString(),
       args.modelCardId,
-      { progress: { status: statusStr, progress: progressNum } },
-      false
+      args.taskId,
+      JSON.stringify({ status: statusStr, progress: progressNum })
     )
+
+    applyModelProgress(args.modelCardId, {
+      status: statusStr,
+      progress: progressNum
+    })
   }
 
   const setModelError = async (args: {
     modelCardId: string
     error: string | { errorMessage: string; dismissible?: boolean }
   }) => {
-    console.error('[Publish Debug Event] setModelError event received from Host App:', args)
+    console.error(
+      '[Publish Debug Event] setModelError event received from Host App:',
+      args
+    )
     const model = documentModelStore.value.models.find(
       (m) => m.modelCardId === args.modelCardId
     ) as IModelCard
-    let errorDetail = typeof args.error === 'string' ? args.error : args.error.errorMessage
+    let errorDetail =
+      typeof args.error === 'string' ? args.error : args.error.errorMessage
     if (errorDetail.includes('GraphQL errors')) {
-      errorDetail = '服务器未启用 Ingestion 模块或参数不匹配 (Request failed with GraphQL errors)。我们已修正 C# 连接器的降级机制。请直接点击【直连发版测试】或重新编译插件生成版本。'
+      errorDetail =
+        '服务器未启用 Ingestion 模块或参数不匹配 (Request failed with GraphQL errors)。我们已修正 C# 连接器的降级机制。请直接点击【直连发版测试】或重新编译插件生成版本。'
     }
 
     if (typeof args.error === 'string') {
